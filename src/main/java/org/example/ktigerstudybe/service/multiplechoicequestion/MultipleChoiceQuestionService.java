@@ -8,8 +8,8 @@ import java.util.List;
 public interface MultipleChoiceQuestionService {
     List<MultipleChoiceQuestionResponse> getAllQuestions();
     MultipleChoiceQuestionResponse getQuestionById(Long id);
-//    List<MultipleChoiceQuestionResponse> getQuestionsByExerciseId(Long exerciseId);
-//    MultipleChoiceQuestionResponse createQuestion(MultipleChoiceQuestionRequest request);
-//    MultipleChoiceQuestionResponse updateQuestion(Long id, MultipleChoiceQuestionRequest request);
-//    void deleteQuestion(Long id);
+    List<MultipleChoiceQuestionResponse> getQuestionsByExerciseId(Long exerciseId);
+    MultipleChoiceQuestionResponse createQuestion(MultipleChoiceQuestionRequest request);
+    MultipleChoiceQuestionResponse updateQuestion(Long id, MultipleChoiceQuestionRequest request);
+    void deleteQuestion(Long id);
 }

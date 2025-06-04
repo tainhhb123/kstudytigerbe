@@ -64,42 +64,42 @@ public class MultipleChoiceQuestionServiceImpl implements MultipleChoiceQuestion
         return toResponse(entity);
     }
 
-//    @Override
-//    public List<MultipleChoiceQuestionResponse> getQuestionsByExerciseId(Long exerciseId) {
-//        return questionRepository.findAll().stream()
-//                .filter(q -> q.getExercise().getExerciseId().equals(exerciseId))
-//                .map(this::toResponse)
-//                .collect(Collectors.toList());
-//        // hoặc nếu có custom query: questionRepository.findByExercise_ExerciseId(exerciseId)
-//    }
+    @Override
+    public List<MultipleChoiceQuestionResponse> getQuestionsByExerciseId(Long exerciseId) {
+        return questionRepository.findAll().stream()
+                .filter(q -> q.getExercise().getExerciseId().equals(exerciseId))
+                .map(this::toResponse)
+                .collect(Collectors.toList());
+        // hoặc nếu có custom query: questionRepository.findByExercise_ExerciseId(exerciseId)
+    }
 
-//    @Override
-//    public MultipleChoiceQuestionResponse createQuestion(MultipleChoiceQuestionRequest request) {
-//        MultipleChoiceQuestion entity = toEntity(request);
-//        entity = questionRepository.save(entity);
-//        return toResponse(entity);
-//    }
-//
-//    @Override
-//    public MultipleChoiceQuestionResponse updateQuestion(Long id, MultipleChoiceQuestionRequest request) {
-//        MultipleChoiceQuestion entity = questionRepository.findById(id)
-//                .orElseThrow(() -> new IllegalArgumentException("Question not found: " + id));
-//        Exercise exercise = exerciseRepository.findById(request.getExerciseId())
-//                .orElseThrow(() -> new IllegalArgumentException("Exercise not found: " + request.getExerciseId()));
-//        entity.setExercise(exercise);
-//        entity.setQuestionText(request.getQuestionText());
-//        entity.setOptionA(request.getOptionA());
-//        entity.setOptionB(request.getOptionB());
-//        entity.setOptionC(request.getOptionC());
-//        entity.setOptionD(request.getOptionD());
-//        entity.setCorrectAnswer(request.getCorrectAnswer());
-//        entity.setLinkMedia(request.getLinkMedia());
-//        entity = questionRepository.save(entity);
-//        return toResponse(entity);
-//    }
-//
-//    @Override
-//    public void deleteQuestion(Long id) {
-//        questionRepository.deleteById(id);
-//    }
+    @Override
+    public MultipleChoiceQuestionResponse createQuestion(MultipleChoiceQuestionRequest request) {
+        MultipleChoiceQuestion entity = toEntity(request);
+        entity = questionRepository.save(entity);
+        return toResponse(entity);
+    }
+
+    @Override
+    public MultipleChoiceQuestionResponse updateQuestion(Long id, MultipleChoiceQuestionRequest request) {
+        MultipleChoiceQuestion entity = questionRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Question not found: " + id));
+        Exercise exercise = exerciseRepository.findById(request.getExerciseId())
+                .orElseThrow(() -> new IllegalArgumentException("Exercise not found: " + request.getExerciseId()));
+        entity.setExercise(exercise);
+        entity.setQuestionText(request.getQuestionText());
+        entity.setOptionA(request.getOptionA());
+        entity.setOptionB(request.getOptionB());
+        entity.setOptionC(request.getOptionC());
+        entity.setOptionD(request.getOptionD());
+        entity.setCorrectAnswer(request.getCorrectAnswer());
+        entity.setLinkMedia(request.getLinkMedia());
+        entity = questionRepository.save(entity);
+        return toResponse(entity);
+    }
+
+    @Override
+    public void deleteQuestion(Long id) {
+        questionRepository.deleteById(id);
+    }
 }

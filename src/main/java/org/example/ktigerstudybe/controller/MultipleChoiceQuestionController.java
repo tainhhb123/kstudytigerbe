@@ -31,31 +31,31 @@ public class MultipleChoiceQuestionController {
         }
     }
 
-//    @GetMapping("/exercise/{exerciseId}")
-//    public List<MultipleChoiceQuestionResponse> getQuestionsByExerciseId(@PathVariable Long exerciseId) {
-//        return questionService.getQuestionsByExerciseId(exerciseId);
-//    }
-//
-//    @PostMapping
-//    public MultipleChoiceQuestionResponse createQuestion(@RequestBody MultipleChoiceQuestionRequest request) {
-//        return questionService.createQuestion(request);
-//    }
-//
-//    @PutMapping("/{id}")
-//    public ResponseEntity<MultipleChoiceQuestionResponse> updateQuestion(
-//            @PathVariable Long id,
-//            @RequestBody MultipleChoiceQuestionRequest request) {
-//        try {
-//            MultipleChoiceQuestionResponse updated = questionService.updateQuestion(id, request);
-//            return ResponseEntity.ok(updated);
-//        } catch (Exception e) {
-//            return ResponseEntity.notFound().build();
-//        }
-//    }
-//
-//    @DeleteMapping("/{id}")
-//    public ResponseEntity<Void> deleteQuestion(@PathVariable Long id) {
-//        questionService.deleteQuestion(id);
-//        return ResponseEntity.noContent().build();
-//    }
+    @GetMapping("/exercise/{exerciseId}")
+    public List<MultipleChoiceQuestionResponse> getQuestionsByExerciseId(@PathVariable Long exerciseId) {
+        return questionService.getQuestionsByExerciseId(exerciseId);
+    }
+
+    @PostMapping
+    public MultipleChoiceQuestionResponse createQuestion(@RequestBody MultipleChoiceQuestionRequest request) {
+        return questionService.createQuestion(request);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<MultipleChoiceQuestionResponse> updateQuestion(
+            @PathVariable Long id,
+            @RequestBody MultipleChoiceQuestionRequest request) {
+        try {
+            MultipleChoiceQuestionResponse updated = questionService.updateQuestion(id, request);
+            return ResponseEntity.ok(updated);
+        } catch (Exception e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteQuestion(@PathVariable Long id) {
+        questionService.deleteQuestion(id);
+        return ResponseEntity.noContent().build();
+    }
 }

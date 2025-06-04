@@ -1,33 +1,33 @@
 package org.example.ktigerstudybe.service.documentList;
 
-import org.example.ktigerstudybe.model.DocumentList;
+import org.example.ktigerstudybe.dto.req.DocumentListRequest;
+import org.example.ktigerstudybe.dto.resp.DocumentListResponse;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface DocumentListService {
 
-    // Tạo mới một danh sách tài liệu
-    DocumentList createDocumentList(DocumentList documentList);
-
-    // Lấy danh sách tất cả các DocumentList
-    List<DocumentList> getAllDocumentLists();
+    // Lấy tất cả các DocumentList
+    List<DocumentListResponse> getAllDocumentLists();
 
     // Lấy DocumentList theo ID
-    Optional<DocumentList> getDocumentListById(Long listId);
+    DocumentListResponse getDocumentListById(Long listId);
 
-    // Cập nhật thông tin một DocumentList
-    DocumentList updateDocumentList(Long listId, DocumentList updatedDocumentList);
+    // Tạo mới một DocumentList
+    DocumentListResponse createDocumentList(DocumentListRequest request);
 
-    // Xóa một DocumentList theo ID
+    // Cập nhật thông tin DocumentList
+    DocumentListResponse updateDocumentList(Long listId, DocumentListRequest request);
+
+    // Xóa DocumentList theo ID
     void deleteDocumentList(Long listId);
 
-    // Lấy tất cả DocumentList của một User cụ thể
-    List<DocumentList> getDocumentListsByUserId(Long userId);
+    // Lấy các DocumentList theo userId
+    List<DocumentListResponse> getDocumentListsByUserId(Long userId);
 
-    // Lấy tất cả DocumentList công khai
-    List<DocumentList> getPublicDocumentLists();
+    // Lấy các DocumentList công khai
+    List<DocumentListResponse> getPublicDocumentLists();
 
-    // Tìm kiếm theo tiêu đề chứa từ khóa
-    List<DocumentList> searchByTitle(String keyword);
+    // Tìm kiếm DocumentList theo tiêu đề
+    List<DocumentListResponse> searchByTitle(String keyword);
 }

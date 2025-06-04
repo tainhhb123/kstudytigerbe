@@ -1,8 +1,19 @@
 package org.example.ktigerstudybe.model;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+
 import java.time.LocalDateTime;
 
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+@Getter
+@Setter
 @Entity
 @Table(name = "document_list")
 public class DocumentList {
@@ -16,7 +27,7 @@ public class DocumentList {
     @JoinColumn(name = "UserID", nullable = false)
     private User user;
 
-    @Column(name = "Title")
+    @Column(name = "Title", nullable = false)
     private String title;
 
     @Column(name = "Description")
@@ -25,82 +36,15 @@ public class DocumentList {
     @Column(name = "Type")
     private String type;
 
-    @Column(name = "CreatedAt")
+    @Column(name = "CreatedAt", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
-    @Column(name = "IsPublic")
+    @Column(name = "IsPublic", nullable = false)
     private int isPublic;
 
-    // Constructors
-
-    public DocumentList() {
-    }
-
-    public DocumentList(User user, String title, String description, String type,
-                        LocalDateTime createdAt, int isPublic) {
-        this.user = user;
-        this.title = title;
-        this.description = description;
-        this.type = type;
-        this.createdAt = createdAt;
-        this.isPublic = isPublic;
-    }
-
-    // Getters & Setters
-
-    public Long getListId() {
-        return listId;
-    }
-
-    public void setListId(Long listId) {
-        this.listId = listId;
-    }
-
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public int getIsPublic() {
-        return isPublic;
-    }
-
-    public void setIsPublic(int isPublic) {
-        this.isPublic = isPublic;
+    // Phương thức này tự động gọi trước khi persist entity vào DB
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = LocalDateTime.now();
     }
 }

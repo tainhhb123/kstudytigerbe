@@ -12,5 +12,6 @@ public interface DocumentListRepository extends JpaRepository<DocumentList, Long
 
     List<DocumentList> findByIsPublic(int isPublic);
 
-    List<DocumentList> findByTitleContainingIgnoreCase(String keyword);
+    List<DocumentList> findByTitleContainingIgnoreCaseAndIsPublic(String keyword, int isPublic);
+
 }

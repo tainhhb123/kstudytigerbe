@@ -16,22 +16,23 @@ public class Lesson {
     @Column(name = "LessonID")
     private Long lessonId;
 
-    @Column(name = "LevelID")
-    private Long levelId;
-
     @Column(name = "LessonName")
     private String lessonName;
 
     @Column(name = "LessonDescription")
     private String lessonDescription;
 
+    @ManyToOne
+    @JoinColumn(name = "LevelID")
+    private Level level;
+
     // Các quan hệ giữ nguyên
-    @OneToMany(mappedBy = "lesson", cascade = CascadeType.ALL)
-    private List<VocabularyTheory> vocabularies;
-
-    @OneToMany(mappedBy = "lesson", cascade = CascadeType.ALL)
-    private List<GrammarTheory> grammars;
-
-    @OneToMany(mappedBy = "lesson", cascade = CascadeType.ALL)
-    private List<Exercise> exercises;
+//    @OneToMany(mappedBy = "lesson", cascade = CascadeType.ALL)
+//    private List<VocabularyTheory> vocabularies;
+//
+//    @OneToMany(mappedBy = "lesson", cascade = CascadeType.ALL)
+//    private List<GrammarTheory> grammars;
+//
+//    @OneToMany(mappedBy = "lesson", cascade = CascadeType.ALL)
+//    private List<Exercise> exercises;
 }

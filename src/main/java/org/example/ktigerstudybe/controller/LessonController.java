@@ -16,15 +16,26 @@ public class LessonController {
     @Autowired
     private LessonService lessonService;
 
+//    @GetMapping
+//    public List<LessonResponse> getAllLessons() {
+//        return lessonService.getAllLessons();
+//    }
+
+    // Lấy tất cả bài học hoặc theo Level
     @GetMapping
-    public List<LessonResponse> getAllLessons() {
+    public List<LessonResponse> getLessons(@RequestParam(required = false) Long levelId) {
+        if (levelId != null) {
+            return lessonService.getLessonsByLevelId(levelId);
+        }
         return lessonService.getAllLessons();
     }
+
 
     @GetMapping("/{id}")
     public LessonResponse getLessonById(@PathVariable Long id) {
         return lessonService.getLessonById(id);
     }
+
 
     @PostMapping
     public LessonResponse createLesson(@RequestBody LessonRequest lessonRequest) {
@@ -41,4 +52,9 @@ public class LessonController {
         lessonService.deleteLesson(id);
         return ResponseEntity.noContent().build();
     }
+
+
+    //
+
+
 }

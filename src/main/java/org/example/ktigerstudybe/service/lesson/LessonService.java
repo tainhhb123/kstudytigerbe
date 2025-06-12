@@ -11,4 +11,6 @@ public interface LessonService {
     List<LessonResponse> getAllLessons();
     LessonResponse getLessonById(Long Id);
     void deleteLesson(Long Id);
+
+    List<LessonResponse> getLessonsByLevelId(Long levelId);
 }

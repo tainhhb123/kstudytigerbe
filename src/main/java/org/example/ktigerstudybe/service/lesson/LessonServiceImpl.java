@@ -68,4 +68,11 @@ public class LessonServiceImpl implements LessonService {
     public void deleteLesson(Long lessonId) {
         lessonRepository.deleteById(lessonId);
     }
+
+    @Override
+    public List<LessonResponse> getLessonsByLevelId(Long levelId) {
+        return lessonRepository.findByLevel_LevelId(levelId).stream()
+                .map(this::toResponse)
+                .collect(Collectors.toList());
+    }
 }

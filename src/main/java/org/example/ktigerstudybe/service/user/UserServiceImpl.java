@@ -5,11 +5,6 @@ import org.example.ktigerstudybe.dto.resp.UserResponse;
 import org.example.ktigerstudybe.model.User;
 import org.example.ktigerstudybe.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-<<<<<<< HEAD
-import org.springframework.stereotype.Service;
-
-import java.util.List;
-import java.util.stream.Collectors;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -44,10 +39,6 @@ public class UserServiceImpl implements UserService {
     user.setFullName(req.getFullName());
     user.setEmail(req.getEmail());
     user.setPassword(req.getPassword());
-    user.setGender(req.getGender());
-    user.setDateOfBirth(req.getDateOfBirth());
-    user.setAvatarImage(req.getAvatarImage());
-    user.setJoinDate(req.getJoinDate());
     user.setRole(req.getRole());
     user.setUserStatus(req.getUserStatus());
     user.setUserName(req.getUserName());
@@ -55,10 +46,6 @@ public class UserServiceImpl implements UserService {
   }
 
   @Override
-  public List<UserResponse> getAllUsers() {
-    return userRepository.findAll().stream()
-            .map(this::toResponse)
-            .collect(Collectors.toList());
   public Page<UserResponse> getAllUsers(Pageable pageable) {
     return userRepository.findAll(pageable)
             .map(this::toResponse);
@@ -67,7 +54,6 @@ public class UserServiceImpl implements UserService {
   @Override
   public UserResponse getUserById(Long id) {
     User user = userRepository.findById(id)
-            .orElseThrow(() -> new IllegalArgumentException("User not found with id: " + id));
             .orElseThrow(() -> new NoSuchElementException("User not found with id: " + id));
     return toResponse(user);
   }
@@ -82,13 +68,6 @@ public class UserServiceImpl implements UserService {
   @Override
   public UserResponse updateUser(Long id, UserRequest request) {
     User user = userRepository.findById(id)
-            .orElseThrow(() -> new IllegalArgumentException("User not found with id: " + id));
-    user.setFullName(request.getFullName());
-    user.setEmail(request.getEmail());
-    user.setGender(request.getGender());
-    user.setDateOfBirth(request.getDateOfBirth());
-    user.setAvatarImage(request.getAvatarImage());
-    user.setJoinDate(request.getJoinDate());
             .orElseThrow(() -> new NoSuchElementException("User not found with id: " + id));
     user.setFullName(request.getFullName());
     user.setEmail(request.getEmail());
@@ -104,7 +83,6 @@ public class UserServiceImpl implements UserService {
   public void deleteUser(Long id) {
     userRepository.deleteById(id);
   }
-
 
   @Override
   public UserResponse freezeUser(Long id) {

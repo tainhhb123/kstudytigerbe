@@ -4,11 +4,6 @@ import org.example.ktigerstudybe.dto.req.UserRequest;
 import org.example.ktigerstudybe.dto.resp.UserResponse;
 import org.example.ktigerstudybe.service.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
@@ -21,11 +16,6 @@ public class UserController {
 
   @Autowired
   private UserService userService;
-
-  @GetMapping
-  public List<UserResponse> getAllUsers() {
-    return userService.getAllUsers();
-  }
 
   // Lấy tất cả user (có phân trang)
   @GetMapping
@@ -46,13 +36,13 @@ public class UserController {
     }
   }
 
-
+  // Tạo mới user
   @PostMapping
   public UserResponse createUser(@RequestBody UserRequest request) {
     return userService.createUser(request);
   }
 
-
+  // Cập nhật user
   @PutMapping("/{id}")
   public ResponseEntity<UserResponse> updateUser(@PathVariable Long id, @RequestBody UserRequest request) {
     try {
@@ -63,7 +53,7 @@ public class UserController {
     }
   }
 
-
+  // Xóa user
   @DeleteMapping("/{id}")
   public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
     userService.deleteUser(id);

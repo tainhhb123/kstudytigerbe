@@ -31,10 +31,10 @@ public class LessonController {
     }
 
 
-    @GetMapping
-    public List<LessonResponse> getAllLessons() {
-        return lessonService.getAllLessons();
-    }
+//    @GetMapping
+//    public List<LessonResponse> getAllLessons() {
+//        return lessonService.getAllLessons();
+//    }
 
     @GetMapping("/{id}")
     public LessonResponse getLessonById(@PathVariable Long id) {

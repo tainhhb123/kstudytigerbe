@@ -2,19 +2,12 @@ package org.example.ktigerstudybe.service.user;
 
 import org.example.ktigerstudybe.dto.req.UserRequest;
 import org.example.ktigerstudybe.dto.resp.UserResponse;
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
 public interface UserService {
-	List<UserResponse> getAllUsers();
-	UserResponse getUserById(Long id);
-	UserResponse createUser(UserRequest request);
-	UserResponse updateUser(Long id, UserRequest request);
-	void deleteUser(Long id);
-}
 	// Lấy tất cả user (có phân trang)
 	Page<UserResponse> getAllUsers(Pageable pageable);
 

@@ -11,9 +11,6 @@ public interface LessonService {
     List<LessonResponse> getAllLessons();
     LessonResponse getLessonById(Long Id);
     void deleteLesson(Long Id);
-<<<<<<< HEAD
 
     List<LessonResponse> getLessonsByLevelId(Long levelId);
-=======
->>>>>>> f7cadc7 (cap nhat api user sign up in)
 }

@@ -68,7 +68,6 @@ public class LessonServiceImpl implements LessonService {
     public void deleteLesson(Long lessonId) {
         lessonRepository.deleteById(lessonId);
     }
-<<<<<<< HEAD
 
     @Override
     public List<LessonResponse> getLessonsByLevelId(Long levelId) {
@@ -76,6 +75,4 @@ public class LessonServiceImpl implements LessonService {
                 .map(this::toResponse)
                 .collect(Collectors.toList());
     }
-=======
->>>>>>> f7cadc7 (cap nhat api user sign up in)
 }

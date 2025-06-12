@@ -5,10 +5,16 @@ import org.example.ktigerstudybe.dto.resp.UserResponse;
 import org.example.ktigerstudybe.model.User;
 import org.example.ktigerstudybe.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+<<<<<<< HEAD
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+
+import java.util.NoSuchElementException;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -53,12 +59,16 @@ public class UserServiceImpl implements UserService {
     return userRepository.findAll().stream()
             .map(this::toResponse)
             .collect(Collectors.toList());
+  public Page<UserResponse> getAllUsers(Pageable pageable) {
+    return userRepository.findAll(pageable)
+            .map(this::toResponse);
   }
 
   @Override
   public UserResponse getUserById(Long id) {
     User user = userRepository.findById(id)
             .orElseThrow(() -> new IllegalArgumentException("User not found with id: " + id));
+            .orElseThrow(() -> new NoSuchElementException("User not found with id: " + id));
     return toResponse(user);
   }
 
@@ -79,6 +89,10 @@ public class UserServiceImpl implements UserService {
     user.setDateOfBirth(request.getDateOfBirth());
     user.setAvatarImage(request.getAvatarImage());
     user.setJoinDate(request.getJoinDate());
+            .orElseThrow(() -> new NoSuchElementException("User not found with id: " + id));
+    user.setFullName(request.getFullName());
+    user.setEmail(request.getEmail());
+    // Không update password ở đây (nếu muốn update password nên có hàm riêng)
     user.setRole(request.getRole());
     user.setUserStatus(request.getUserStatus());
     user.setUserName(request.getUserName());
@@ -90,4 +104,32 @@ public class UserServiceImpl implements UserService {
   public void deleteUser(Long id) {
     userRepository.deleteById(id);
   }
+
+
+  @Override
+  public UserResponse freezeUser(Long id) {
+    User user = userRepository.findById(id)
+            .orElseThrow(() -> new NoSuchElementException("User not found with id: " + id));
+    user.setUserStatus(1); // 1 = frozen
+    user = userRepository.save(user);
+    return toResponse(user);
+  }
+
+  @Override
+  public UserResponse unfreezeUser(Long id) {
+    User user = userRepository.findById(id)
+            .orElseThrow(() -> new NoSuchElementException("User not found with id: " + id));
+    user.setUserStatus(0); // 0 = active
+    user = userRepository.save(user);
+    return toResponse(user);
+  }
+
+  @Override
+  public Page<UserResponse> searchUsers(String keyword, Pageable pageable) {
+    return userRepository
+            .findByFullNameContainingIgnoreCaseOrEmailContainingIgnoreCaseOrUserNameContainingIgnoreCase(
+                    keyword, keyword, keyword, pageable)
+            .map(this::toResponse);
+  }
+
 }

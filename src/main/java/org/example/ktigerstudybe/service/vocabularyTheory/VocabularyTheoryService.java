@@ -11,4 +11,6 @@ public interface VocabularyTheoryService {
     VocabularyTheoryResponse createVocabularyTheory(VocabularyTheoryRequest request);
     VocabularyTheoryResponse updateVocabularyTheory(Long id, VocabularyTheoryRequest request);
     void deleteVocabularyTheory(Long id);
+    List<VocabularyTheoryResponse> getVocabulariesByLessonId(Long lessonId);
+    List<VocabularyTheoryResponse> getVocabulariesByLevelId(Long levelId);
 }

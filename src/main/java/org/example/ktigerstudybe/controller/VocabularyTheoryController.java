@@ -58,4 +58,15 @@ public class VocabularyTheoryController {
         vocabularyTheoryService.deleteVocabularyTheory(id);
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/lesson/{lessonId}")
+    public List<VocabularyTheoryResponse> getVocabsByLesson(@PathVariable Long lessonId) {
+        return vocabularyTheoryService.getVocabulariesByLessonId(lessonId);
+    }
+
+
+    @GetMapping("/level/{levelId}")
+    public List<VocabularyTheoryResponse> getVocabsByLevel(@PathVariable Long levelId) {
+        return vocabularyTheoryService.getVocabulariesByLevelId(levelId);
+    }
 }

@@ -5,6 +5,7 @@ import org.example.ktigerstudybe.dto.resp.VocabularyTheoryResponse;
 import org.example.ktigerstudybe.model.Lesson;
 import org.example.ktigerstudybe.model.VocabularyTheory;
 import org.example.ktigerstudybe.repository.LessonRepository;
+import org.example.ktigerstudybe.repository.LevelRepository;
 import org.example.ktigerstudybe.repository.VocabularyTheoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -21,14 +22,20 @@ public class VocabularyTheoryServiceImpl implements VocabularyTheoryService {
     @Autowired
     private LessonRepository lessonRepository;
 
+    private LevelRepository levelRepository;
+
     // Map entity -> response DTO
     private VocabularyTheoryResponse toResponse(VocabularyTheory vocab) {
         VocabularyTheoryResponse resp = new VocabularyTheoryResponse();
         resp.setVocabId(vocab.getVocabId());
-        resp.setLessonId(vocab.getLesson().getLessonId());
+        resp.setLessonId(vocab.getLesson().getLessonId()); // dòng này giúp FE biết lessonId
         resp.setWord(vocab.getWord());
         resp.setMeaning(vocab.getMeaning());
         resp.setExample(vocab.getExample());
+
+        //them
+        resp.setLevelId(vocab.getLesson().getLevel().getLevelId());
+        resp.setLevelName(vocab.getLesson().getLevel().getLevelName());
         return resp;
     }
 
@@ -84,5 +91,20 @@ public class VocabularyTheoryServiceImpl implements VocabularyTheoryService {
     @Override
     public void deleteVocabularyTheory(Long id) {
         vocabularyTheoryRepository.deleteById(id);
+    }
+
+    @Override
+    public List<VocabularyTheoryResponse> getVocabulariesByLessonId(Long lessonId) {
+        return vocabularyTheoryRepository.findByLesson_LessonId(lessonId)
+                .stream()
+                .map(this::toResponse)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<VocabularyTheoryResponse> getVocabulariesByLevelId(Long levelId) {
+        return vocabularyTheoryRepository.findByLevelId(levelId)
+                .stream().map(this::toResponse)
+                .collect(Collectors.toList());
     }
 }

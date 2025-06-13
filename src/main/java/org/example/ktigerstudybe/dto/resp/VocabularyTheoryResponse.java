@@ -10,4 +10,6 @@ public class VocabularyTheoryResponse {
     private String word;
     private String meaning;
     private String example;
+    private Long levelId;
+    private String levelName;
 }

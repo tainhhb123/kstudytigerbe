@@ -26,6 +26,8 @@ public class Lesson {
     @JoinColumn(name = "LevelID")
     private Level level;
 
+    @OneToMany(mappedBy = "lesson")
+    private List<VocabularyTheory> vocabularies;
     // Các quan hệ giữ nguyên
 //    @OneToMany(mappedBy = "lesson", cascade = CascadeType.ALL)
 //    private List<VocabularyTheory> vocabularies;

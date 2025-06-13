@@ -29,15 +29,15 @@ public class Lesson {
     private String lessonDescription;
 
 
-    // Các quan hệ giữ nguyên
-//    @OneToMany(mappedBy = "lesson", cascade = CascadeType.ALL)
-//    private List<VocabularyTheory> vocabularies;
-//
-//    @OneToMany(mappedBy = "lesson", cascade = CascadeType.ALL)
-//    private List<GrammarTheory> grammars;
-//
-//    @OneToMany(mappedBy = "lesson", cascade = CascadeType.ALL)
-//    private List<Exercise> exercises;
+    @OneToMany(mappedBy = "lesson", cascade = CascadeType.ALL)
+    private List<VocabularyTheory> vocabularies;
+
+    @OneToMany(mappedBy = "lesson", cascade = CascadeType.ALL)
+    private List<GrammarTheory> grammars;
+
+    @OneToMany(mappedBy = "lesson", cascade = CascadeType.ALL)
+    private List<Exercise> exercises;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "LevelID", referencedColumnName = "LevelID")
     private Level level;

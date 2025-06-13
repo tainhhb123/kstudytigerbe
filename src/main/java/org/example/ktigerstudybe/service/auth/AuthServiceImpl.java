@@ -37,7 +37,8 @@ public class AuthServiceImpl implements AuthService {
         resp.setUserId(user.getUserId());
         resp.setEmail(user.getEmail());
         resp.setFullName(user.getFullName());
-        resp.setToken("dummy-token-for-now"); // Thay JWT thật vào đây
+        resp.setToken("dummy-token-for-now");
+        resp.setRole(user.getRole());
 
         return resp;
     }
@@ -55,7 +56,8 @@ public class AuthServiceImpl implements AuthService {
         resp.setUserId(user.getUserId());
         resp.setEmail(user.getEmail());
         resp.setFullName(user.getFullName());
-        resp.setToken("dummy-token-for-now"); // Thay JWT thật vào đây
+        resp.setToken("dummy-token-for-now");
+        resp.setRole(user.getRole());
 
         return resp;
     }

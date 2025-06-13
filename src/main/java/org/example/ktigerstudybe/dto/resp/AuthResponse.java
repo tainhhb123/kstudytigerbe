@@ -7,5 +7,6 @@ public class AuthResponse {
     private Long userId;
     private String email;
     private String fullName;
-    private String token; // JWT hoặc token tương tự
+    private String token;
+    private String role;
 }

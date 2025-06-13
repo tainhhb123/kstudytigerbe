@@ -4,12 +4,18 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+
+
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 import java.util.List;
 
-@Getter
-@Setter
 @Entity
 @Table(name = "lesson")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class Lesson {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -22,9 +28,6 @@ public class Lesson {
     @Column(name = "LessonDescription")
     private String lessonDescription;
 
-    @ManyToOne
-    @JoinColumn(name = "LevelID")
-    private Level level;
 
     @OneToMany(mappedBy = "lesson")
     private List<VocabularyTheory> vocabularies;
@@ -37,4 +40,7 @@ public class Lesson {
 //
 //    @OneToMany(mappedBy = "lesson", cascade = CascadeType.ALL)
 //    private List<Exercise> exercises;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "LevelID", referencedColumnName = "LevelID")
+    private Level level;
 }

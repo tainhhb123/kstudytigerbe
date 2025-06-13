@@ -2,16 +2,20 @@ package org.example.ktigerstudybe.model;
 
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.List;
 
 @Entity
+@Table(name = "level")
 @Getter
 @Setter
-@Table(name = "level")
+@NoArgsConstructor
+@AllArgsConstructor
 public class Level {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "LevelID")

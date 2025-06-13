@@ -9,7 +9,6 @@ import lombok.Setter;
 @Entity
 @Table(name = "exercise")
 public class Exercise {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ExerciseID")
@@ -27,6 +26,4 @@ public class Exercise {
 
     @Column(name = "ExerciseDescription")
     private String exerciseDescription;
-
 }
-

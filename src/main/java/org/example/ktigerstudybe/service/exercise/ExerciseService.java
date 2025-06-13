@@ -11,4 +11,5 @@ public interface ExerciseService {
     ExerciseResponse createExercise(ExerciseRequest request);
     ExerciseResponse updateExercise(Long id, ExerciseRequest request);
     void deleteExercise(Long id);
+    List<ExerciseResponse> getExercisesByLessonId(Long lessonId);
 }

@@ -58,4 +58,14 @@ public class GrammarTheoryController {
         grammarTheoryService.deleteGrammarTheory(id);
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/lesson/{lessonId}")
+    public List<GrammarTheoryResponse> getGrammarByLesson(@PathVariable Long lessonId) {
+        return grammarTheoryService.getGrammarByLessonId(lessonId);
+    }
+
+    @GetMapping("/level/{levelId}")
+    public List<GrammarTheoryResponse> getGrammarByLevel(@PathVariable Long levelId) {
+        return grammarTheoryService.getGrammarByLevelId(levelId);
+    }
 }

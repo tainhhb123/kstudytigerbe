@@ -4,7 +4,7 @@ import lombok.Data;
 
 @Data
 public class MultipleChoiceQuestionRequest {
-    private Long exerciseId;      // Foreign key
+    private Long exerciseId;
     private String questionText;
     private String optionA;
     private String optionB;

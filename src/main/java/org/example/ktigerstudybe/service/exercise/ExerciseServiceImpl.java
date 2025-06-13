@@ -21,7 +21,6 @@ public class ExerciseServiceImpl implements ExerciseService {
     @Autowired
     private LessonRepository lessonRepository;
 
-    // Mapping entity sang response DTO
     private ExerciseResponse toResponse(Exercise entity) {
         ExerciseResponse resp = new ExerciseResponse();
         resp.setExerciseId(entity.getExerciseId());
@@ -32,7 +31,6 @@ public class ExerciseServiceImpl implements ExerciseService {
         return resp;
     }
 
-    // Mapping request DTO sang entity
     private Exercise toEntity(ExerciseRequest req) {
         Exercise entity = new Exercise();
         Lesson lesson = lessonRepository.findById(req.getLessonId())
@@ -82,5 +80,11 @@ public class ExerciseServiceImpl implements ExerciseService {
     @Override
     public void deleteExercise(Long id) {
         exerciseRepository.deleteById(id);
+    }
+
+    @Override
+    public List<ExerciseResponse> getExercisesByLessonId(Long lessonId) {
+        return exerciseRepository.findByLesson_LessonId(lessonId).stream()
+                .map(this::toResponse).collect(Collectors.toList());
     }
 }

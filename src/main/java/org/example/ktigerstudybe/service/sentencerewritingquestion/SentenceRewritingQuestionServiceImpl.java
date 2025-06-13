@@ -13,10 +13,10 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-public class SentenceRewritingQuestionServiceImpl implements SentenceRewritingQuestionService{
+public class SentenceRewritingQuestionServiceImpl implements SentenceRewritingQuestionService {
 
     @Autowired
-    private SentenceRewritingQuestionRepository questionRepository;
+    private SentenceRewritingQuestionRepository repo;
 
     @Autowired
     private ExerciseRepository exerciseRepository;
@@ -34,7 +34,7 @@ public class SentenceRewritingQuestionServiceImpl implements SentenceRewritingQu
     private SentenceRewritingQuestion toEntity(SentenceRewritingQuestionRequest req) {
         SentenceRewritingQuestion entity = new SentenceRewritingQuestion();
         Exercise exercise = exerciseRepository.findById(req.getExerciseId())
-                .orElseThrow(() -> new IllegalArgumentException("Exercise not found: " + req.getExerciseId()));
+                .orElseThrow(() -> new IllegalArgumentException("Exercise not found with id: " + req.getExerciseId()));
         entity.setExercise(exercise);
         entity.setOriginalSentence(req.getOriginalSentence());
         entity.setRewrittenSentence(req.getRewrittenSentence());
@@ -43,48 +43,43 @@ public class SentenceRewritingQuestionServiceImpl implements SentenceRewritingQu
     }
 
     @Override
-    public List<SentenceRewritingQuestionResponse> getAllQuestions() {
-        return questionRepository.findAll().stream().map(this::toResponse).collect(Collectors.toList());
+    public List<SentenceRewritingQuestionResponse> getAll() {
+        return repo.findAll().stream().map(this::toResponse).collect(Collectors.toList());
     }
 
     @Override
-    public SentenceRewritingQuestionResponse getQuestionById(Long id) {
-        SentenceRewritingQuestion entity = questionRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Question not found: " + id));
-        return toResponse(entity);
+    public SentenceRewritingQuestionResponse getById(Long id) {
+        return repo.findById(id).map(this::toResponse)
+                .orElseThrow(() -> new IllegalArgumentException("Question not found with id: " + id));
     }
 
     @Override
-    public List<SentenceRewritingQuestionResponse> getQuestionsByExerciseId(Long exerciseId) {
-        return questionRepository.findAll().stream()
-                .filter(q -> q.getExercise().getExerciseId().equals(exerciseId))
-                .map(this::toResponse)
-                .collect(Collectors.toList());
-    }
-
-    @Override
-    public SentenceRewritingQuestionResponse createQuestion(SentenceRewritingQuestionRequest request) {
+    public SentenceRewritingQuestionResponse create(SentenceRewritingQuestionRequest request) {
         SentenceRewritingQuestion entity = toEntity(request);
-        entity = questionRepository.save(entity);
-        return toResponse(entity);
+        return toResponse(repo.save(entity));
     }
 
     @Override
-    public SentenceRewritingQuestionResponse updateQuestion(Long id, SentenceRewritingQuestionRequest request) {
-        SentenceRewritingQuestion entity = questionRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Question not found: " + id));
+    public SentenceRewritingQuestionResponse update(Long id, SentenceRewritingQuestionRequest request) {
+        SentenceRewritingQuestion entity = repo.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Question not found with id: " + id));
         Exercise exercise = exerciseRepository.findById(request.getExerciseId())
-                .orElseThrow(() -> new IllegalArgumentException("Exercise not found: " + request.getExerciseId()));
+                .orElseThrow(() -> new IllegalArgumentException("Exercise not found with id: " + request.getExerciseId()));
         entity.setExercise(exercise);
         entity.setOriginalSentence(request.getOriginalSentence());
         entity.setRewrittenSentence(request.getRewrittenSentence());
         entity.setLinkMedia(request.getLinkMedia());
-        entity = questionRepository.save(entity);
-        return toResponse(entity);
+        return toResponse(repo.save(entity));
     }
 
     @Override
-    public void deleteQuestion(Long id) {
-        questionRepository.deleteById(id);
+    public void delete(Long id) {
+        repo.deleteById(id);
+    }
+
+    @Override
+    public List<SentenceRewritingQuestionResponse> getByExerciseId(Long exerciseId) {
+        return repo.findByExercise_ExerciseId(exerciseId)
+                .stream().map(this::toResponse).collect(Collectors.toList());
     }
 }

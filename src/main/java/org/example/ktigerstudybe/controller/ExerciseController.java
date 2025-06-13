@@ -31,6 +31,11 @@ public class ExerciseController {
         }
     }
 
+    @GetMapping("/lesson/{lessonId}")
+    public List<ExerciseResponse> getExercisesByLesson(@PathVariable Long lessonId) {
+        return exerciseService.getExercisesByLessonId(lessonId);
+    }
+
     @PostMapping
     public ExerciseResponse createExercise(@RequestBody ExerciseRequest request) {
         return exerciseService.createExercise(request);

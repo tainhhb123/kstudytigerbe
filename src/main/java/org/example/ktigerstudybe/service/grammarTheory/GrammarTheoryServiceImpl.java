@@ -21,7 +21,6 @@ public class GrammarTheoryServiceImpl implements GrammarTheoryService {
     @Autowired
     private LessonRepository lessonRepository;
 
-    // Entity -> Response DTO
     private GrammarTheoryResponse toResponse(GrammarTheory entity) {
         GrammarTheoryResponse resp = new GrammarTheoryResponse();
         resp.setGrammarId(entity.getGrammarId());
@@ -29,10 +28,11 @@ public class GrammarTheoryServiceImpl implements GrammarTheoryService {
         resp.setGrammarTitle(entity.getGrammarTitle());
         resp.setGrammarContent(entity.getGrammarContent());
         resp.setGrammarExample(entity.getGrammarExample());
+        resp.setLevelId(entity.getLesson().getLevel().getLevelId());
+        resp.setLevelName(entity.getLesson().getLevel().getLevelName());
         return resp;
     }
 
-    // Request DTO -> Entity
     private GrammarTheory toEntity(GrammarTheoryRequest req) {
         GrammarTheory entity = new GrammarTheory();
         Lesson lesson = lessonRepository.findById(req.getLessonId())
@@ -82,5 +82,17 @@ public class GrammarTheoryServiceImpl implements GrammarTheoryService {
     @Override
     public void deleteGrammarTheory(Long id) {
         grammarTheoryRepository.deleteById(id);
+    }
+
+    @Override
+    public List<GrammarTheoryResponse> getGrammarByLessonId(Long lessonId) {
+        return grammarTheoryRepository.findByLesson_LessonId(lessonId)
+                .stream().map(this::toResponse).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<GrammarTheoryResponse> getGrammarByLevelId(Long levelId) {
+        return grammarTheoryRepository.findByLevelId(levelId)
+                .stream().map(this::toResponse).collect(Collectors.toList());
     }
 }

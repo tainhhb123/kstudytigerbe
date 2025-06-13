@@ -11,4 +11,6 @@ public interface GrammarTheoryService {
     GrammarTheoryResponse createGrammarTheory(GrammarTheoryRequest request);
     GrammarTheoryResponse updateGrammarTheory(Long id, GrammarTheoryRequest request);
     void deleteGrammarTheory(Long id);
+    List<GrammarTheoryResponse> getGrammarByLessonId(Long lessonId);
+    List<GrammarTheoryResponse> getGrammarByLevelId(Long levelId);
 }

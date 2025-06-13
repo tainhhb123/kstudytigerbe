@@ -2,17 +2,14 @@ package org.example.ktigerstudybe.service.sentencerewritingquestion;
 
 import org.example.ktigerstudybe.dto.req.SentenceRewritingQuestionRequest;
 import org.example.ktigerstudybe.dto.resp.SentenceRewritingQuestionResponse;
-import org.example.ktigerstudybe.model.SentenceRewritingQuestion;
 
 import java.util.List;
 
 public interface SentenceRewritingQuestionService {
-    List<SentenceRewritingQuestionResponse> getAllQuestions();
-    SentenceRewritingQuestionResponse getQuestionById(Long id);
-    List<SentenceRewritingQuestionResponse> getQuestionsByExerciseId(Long exerciseId);
-    SentenceRewritingQuestionResponse createQuestion(SentenceRewritingQuestionRequest request);
-    SentenceRewritingQuestionResponse updateQuestion(Long id, SentenceRewritingQuestionRequest request);
-    void deleteQuestion(Long id);
-
-
+    List<SentenceRewritingQuestionResponse> getAll();
+    SentenceRewritingQuestionResponse getById(Long id);
+    SentenceRewritingQuestionResponse create(SentenceRewritingQuestionRequest request);
+    SentenceRewritingQuestionResponse update(Long id, SentenceRewritingQuestionRequest request);
+    void delete(Long id);
+    List<SentenceRewritingQuestionResponse> getByExerciseId(Long exerciseId);
 }

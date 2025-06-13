@@ -9,7 +9,6 @@ public class GrammarTheoryResponse {
     private String grammarTitle;
     private String grammarContent;
     private String grammarExample;
-    // Nếu muốn trả thêm tên bài học:
-    // private String lessonName;
+    private Long levelId;
+    private String levelName;
 }
-

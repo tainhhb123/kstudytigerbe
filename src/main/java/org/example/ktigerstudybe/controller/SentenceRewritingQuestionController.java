@@ -10,52 +10,39 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/sentence-rewriting-questions")
+@RequestMapping("/api/sentence-rewriting")
 public class SentenceRewritingQuestionController {
 
     @Autowired
-    private SentenceRewritingQuestionService questionService;
+    private SentenceRewritingQuestionService service;
 
     @GetMapping
-    public List<SentenceRewritingQuestionResponse> getAllQuestions() {
-        return questionService.getAllQuestions();
+    public List<SentenceRewritingQuestionResponse> getAll() {
+        return service.getAll();
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<SentenceRewritingQuestionResponse> getQuestionById(@PathVariable Long id) {
-        try {
-            SentenceRewritingQuestionResponse resp = questionService.getQuestionById(id);
-            return ResponseEntity.ok(resp);
-        } catch (Exception e) {
-            return ResponseEntity.notFound().build();
-        }
-    }
-
-    @GetMapping("/exercise/{exerciseId}")
-    public List<SentenceRewritingQuestionResponse> getQuestionsByExerciseId(@PathVariable Long exerciseId) {
-        return questionService.getQuestionsByExerciseId(exerciseId);
+    public ResponseEntity<SentenceRewritingQuestionResponse> getById(@PathVariable Long id) {
+        return ResponseEntity.ok(service.getById(id));
     }
 
     @PostMapping
-    public SentenceRewritingQuestionResponse createQuestion(@RequestBody SentenceRewritingQuestionRequest request) {
-        return questionService.createQuestion(request);
+    public SentenceRewritingQuestionResponse create(@RequestBody SentenceRewritingQuestionRequest request) {
+        return service.create(request);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<SentenceRewritingQuestionResponse> updateQuestion(
-            @PathVariable Long id,
-            @RequestBody SentenceRewritingQuestionRequest request) {
-        try {
-            SentenceRewritingQuestionResponse updated = questionService.updateQuestion(id, request);
-            return ResponseEntity.ok(updated);
-        } catch (Exception e) {
-            return ResponseEntity.notFound().build();
-        }
+    public SentenceRewritingQuestionResponse update(@PathVariable Long id, @RequestBody SentenceRewritingQuestionRequest request) {
+        return service.update(id, request);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteQuestion(@PathVariable Long id) {
-        questionService.deleteQuestion(id);
-        return ResponseEntity.noContent().build();
+    public void delete(@PathVariable Long id) {
+        service.delete(id);
+    }
+
+    @GetMapping("/exercise/{exerciseId}")
+    public List<SentenceRewritingQuestionResponse> getByExercise(@PathVariable Long exerciseId) {
+        return service.getByExerciseId(exerciseId);
     }
 }

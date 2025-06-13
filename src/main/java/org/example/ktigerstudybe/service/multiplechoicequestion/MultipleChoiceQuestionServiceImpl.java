@@ -21,85 +21,81 @@ public class MultipleChoiceQuestionServiceImpl implements MultipleChoiceQuestion
     @Autowired
     private ExerciseRepository exerciseRepository;
 
-    // Entity → DTO
-    private MultipleChoiceQuestionResponse toResponse(MultipleChoiceQuestion entity) {
+    private MultipleChoiceQuestionResponse toResponse(MultipleChoiceQuestion q) {
         MultipleChoiceQuestionResponse resp = new MultipleChoiceQuestionResponse();
-        resp.setQuestionId(entity.getQuestionId());
-        resp.setExerciseId(entity.getExercise().getExerciseId());
-        resp.setQuestionText(entity.getQuestionText());
-        resp.setOptionA(entity.getOptionA());
-        resp.setOptionB(entity.getOptionB());
-        resp.setOptionC(entity.getOptionC());
-        resp.setOptionD(entity.getOptionD());
-        resp.setCorrectAnswer(entity.getCorrectAnswer());
-        resp.setLinkMedia(entity.getLinkMedia());
+        resp.setQuestionId(q.getQuestionId());
+        resp.setExerciseId(q.getExercise().getExerciseId());
+        resp.setQuestionText(q.getQuestionText());
+        resp.setOptionA(q.getOptionA());
+        resp.setOptionB(q.getOptionB());
+        resp.setOptionC(q.getOptionC());
+        resp.setOptionD(q.getOptionD());
+        resp.setCorrectAnswer(q.getCorrectAnswer());
+        resp.setLinkMedia(q.getLinkMedia());
         return resp;
     }
 
-    // Request → Entity
     private MultipleChoiceQuestion toEntity(MultipleChoiceQuestionRequest req) {
-        MultipleChoiceQuestion entity = new MultipleChoiceQuestion();
         Exercise exercise = exerciseRepository.findById(req.getExerciseId())
-                .orElseThrow(() -> new IllegalArgumentException("Exercise not found: " + req.getExerciseId()));
-        entity.setExercise(exercise);
-        entity.setQuestionText(req.getQuestionText());
-        entity.setOptionA(req.getOptionA());
-        entity.setOptionB(req.getOptionB());
-        entity.setOptionC(req.getOptionC());
-        entity.setOptionD(req.getOptionD());
-        entity.setCorrectAnswer(req.getCorrectAnswer());
-        entity.setLinkMedia(req.getLinkMedia());
-        return entity;
+                .orElseThrow(() -> new IllegalArgumentException("Exercise not found with id: " + req.getExerciseId()));
+
+        MultipleChoiceQuestion q = new MultipleChoiceQuestion();
+        q.setExercise(exercise);
+        q.setQuestionText(req.getQuestionText());
+        q.setOptionA(req.getOptionA());
+        q.setOptionB(req.getOptionB());
+        q.setOptionC(req.getOptionC());
+        q.setOptionD(req.getOptionD());
+        q.setCorrectAnswer(req.getCorrectAnswer());
+        q.setLinkMedia(req.getLinkMedia());
+        return q;
     }
 
     @Override
-    public List<MultipleChoiceQuestionResponse> getAllQuestions() {
+    public List<MultipleChoiceQuestionResponse> getAll() {
         return questionRepository.findAll().stream().map(this::toResponse).collect(Collectors.toList());
     }
 
     @Override
-    public MultipleChoiceQuestionResponse getQuestionById(Long id) {
-        MultipleChoiceQuestion entity = questionRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Question not found: " + id));
-        return toResponse(entity);
+    public MultipleChoiceQuestionResponse getById(Long id) {
+        return questionRepository.findById(id).map(this::toResponse)
+                .orElseThrow(() -> new IllegalArgumentException("Question not found with id: " + id));
     }
 
     @Override
-    public List<MultipleChoiceQuestionResponse> getQuestionsByExerciseId(Long exerciseId) {
-        return questionRepository.findAll().stream()
-                .filter(q -> q.getExercise().getExerciseId().equals(exerciseId))
-                .map(this::toResponse)
-                .collect(Collectors.toList());
-        // hoặc nếu có custom query: questionRepository.findByExercise_ExerciseId(exerciseId)
+    public MultipleChoiceQuestionResponse create(MultipleChoiceQuestionRequest request) {
+        MultipleChoiceQuestion q = toEntity(request);
+        q = questionRepository.save(q);
+        return toResponse(q);
     }
 
     @Override
-    public MultipleChoiceQuestionResponse createQuestion(MultipleChoiceQuestionRequest request) {
-        MultipleChoiceQuestion entity = toEntity(request);
-        entity = questionRepository.save(entity);
-        return toResponse(entity);
-    }
+    public MultipleChoiceQuestionResponse update(Long id, MultipleChoiceQuestionRequest request) {
+        MultipleChoiceQuestion q = questionRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Question not found with id: " + id));
 
-    @Override
-    public MultipleChoiceQuestionResponse updateQuestion(Long id, MultipleChoiceQuestionRequest request) {
-        MultipleChoiceQuestion entity = questionRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Question not found: " + id));
         Exercise exercise = exerciseRepository.findById(request.getExerciseId())
-                .orElseThrow(() -> new IllegalArgumentException("Exercise not found: " + request.getExerciseId()));
-        entity.setExercise(exercise);
-        entity.setQuestionText(request.getQuestionText());
-        entity.setOptionA(request.getOptionA());
-        entity.setOptionB(request.getOptionB());
-        entity.setOptionC(request.getOptionC());
-        entity.setOptionD(request.getOptionD());
-        entity.setCorrectAnswer(request.getCorrectAnswer());
-        entity.setLinkMedia(request.getLinkMedia());
-        entity = questionRepository.save(entity);
-        return toResponse(entity);
+                .orElseThrow(() -> new IllegalArgumentException("Exercise not found with id: " + request.getExerciseId()));
+
+        q.setExercise(exercise);
+        q.setQuestionText(request.getQuestionText());
+        q.setOptionA(request.getOptionA());
+        q.setOptionB(request.getOptionB());
+        q.setOptionC(request.getOptionC());
+        q.setOptionD(request.getOptionD());
+        q.setCorrectAnswer(request.getCorrectAnswer());
+        q.setLinkMedia(request.getLinkMedia());
+        q = questionRepository.save(q);
+        return toResponse(q);
     }
 
     @Override
-    public void deleteQuestion(Long id) {
+    public void delete(Long id) {
         questionRepository.deleteById(id);
+    }
+
+    @Override
+    public List<MultipleChoiceQuestionResponse> getByExerciseId(Long exerciseId) {
+        return questionRepository.findByExercise_ExerciseId(exerciseId).stream().map(this::toResponse).collect(Collectors.toList());
     }
 }

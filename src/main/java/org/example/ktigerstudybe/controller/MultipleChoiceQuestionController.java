@@ -10,52 +10,48 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/multiple-choice-questions")
+@RequestMapping("/api/mcq")
 public class MultipleChoiceQuestionController {
 
     @Autowired
-    private MultipleChoiceQuestionService questionService;
+    private MultipleChoiceQuestionService service;
 
     @GetMapping
-    public List<MultipleChoiceQuestionResponse> getAllQuestions() {
-        return questionService.getAllQuestions();
+    public List<MultipleChoiceQuestionResponse> getAll() {
+        return service.getAll();
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<MultipleChoiceQuestionResponse> getQuestionById(@PathVariable Long id) {
+    public ResponseEntity<MultipleChoiceQuestionResponse> getById(@PathVariable Long id) {
         try {
-            MultipleChoiceQuestionResponse resp = questionService.getQuestionById(id);
-            return ResponseEntity.ok(resp);
+            return ResponseEntity.ok(service.getById(id));
         } catch (Exception e) {
             return ResponseEntity.notFound().build();
         }
     }
 
     @GetMapping("/exercise/{exerciseId}")
-    public List<MultipleChoiceQuestionResponse> getQuestionsByExerciseId(@PathVariable Long exerciseId) {
-        return questionService.getQuestionsByExerciseId(exerciseId);
+    public List<MultipleChoiceQuestionResponse> getByExercise(@PathVariable Long exerciseId) {
+        return service.getByExerciseId(exerciseId);
     }
 
     @PostMapping
-    public MultipleChoiceQuestionResponse createQuestion(@RequestBody MultipleChoiceQuestionRequest request) {
-        return questionService.createQuestion(request);
+    public MultipleChoiceQuestionResponse create(@RequestBody MultipleChoiceQuestionRequest request) {
+        return service.create(request);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<MultipleChoiceQuestionResponse> updateQuestion(
-            @PathVariable Long id,
-            @RequestBody MultipleChoiceQuestionRequest request) {
+    public ResponseEntity<MultipleChoiceQuestionResponse> update(@PathVariable Long id, @RequestBody MultipleChoiceQuestionRequest request) {
         try {
-            MultipleChoiceQuestionResponse updated = questionService.updateQuestion(id, request);
-            return ResponseEntity.ok(updated);
+            return ResponseEntity.ok(service.update(id, request));
         } catch (Exception e) {
             return ResponseEntity.notFound().build();
         }
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteQuestion(@PathVariable Long id) {
-        questionService.deleteQuestion(id);
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
+        service.delete(id);
         return ResponseEntity.noContent().build();
     }
 }

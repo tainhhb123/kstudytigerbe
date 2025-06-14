@@ -3,9 +3,12 @@ package org.example.ktigerstudybe.controller;
 import org.example.ktigerstudybe.dto.resp.UserProgressResponse;
 import org.example.ktigerstudybe.service.userprocess.UserProgressService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import java.util.List;
 
 @RestController
@@ -28,4 +31,16 @@ public class UserProgressController {
         List<UserProgressResponse> response = userProgressService.getAllUserProgress();
         return ResponseEntity.ok(response);
     }
+
+
+    @GetMapping("/paged")
+    public ResponseEntity<Page<UserProgressResponse>> getProgressPaged(
+            @PageableDefault(size = 10, sort = "lastAccessed", direction = Sort.Direction.DESC)
+            Pageable pageable
+    ) {
+        Page<UserProgressResponse> page = userProgressService.getAllUserProgress(pageable);
+        return ResponseEntity.ok(page);
+    }
+
+
 }

@@ -8,6 +8,8 @@ import org.example.ktigerstudybe.repository.DocumentListRepository;
 import org.example.ktigerstudybe.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -44,6 +46,7 @@ public class DocumentListServiceImpl implements DocumentListService {
         DocumentListResponse resp = new DocumentListResponse();
         resp.setListId(entity.getListId());
         resp.setUserId(entity.getUser().getUserId());
+        resp.setFullName(entity.getUser().getFullName());
         resp.setTitle(entity.getTitle());
         resp.setDescription(entity.getDescription());
         resp.setType(entity.getType());
@@ -121,6 +124,27 @@ public class DocumentListServiceImpl implements DocumentListService {
                 .stream()
                 .map(this::toResponse)
                 .collect(Collectors.toList());
+    }
+
+    //Admin
+
+    @Override
+    public Page<DocumentListResponse> listByUser(Long userId, Pageable pg) {
+        return documentListRepository
+                .findByUser_UserIdAndIsPublic(userId, 1, pg)
+                .map(this::toResponse);
+    }
+
+    @Override
+    public Page<DocumentListResponse> searchPublic(String keyword, Pageable pageable) {
+        String kw = keyword == null ? "" : keyword.trim();
+        return documentListRepository
+                .findByIsPublicAndTitleContainingIgnoreCaseOrIsPublicAndUser_FullNameContainingIgnoreCase(
+                        1, kw,
+                        1, kw,
+                        pageable
+                )
+                .map(this::toResponse);
     }
 
 }

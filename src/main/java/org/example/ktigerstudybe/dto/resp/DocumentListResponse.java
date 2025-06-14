@@ -11,6 +11,8 @@ public class DocumentListResponse {
 
     private Long userId;
 
+    private String fullName;
+
     private String title;
 
     private String description;
@@ -18,6 +20,7 @@ public class DocumentListResponse {
     private String type;
 
     private LocalDateTime createdAt;
+
 
     private int isPublic; // hoặc boolean nếu bạn đổi entity
 }

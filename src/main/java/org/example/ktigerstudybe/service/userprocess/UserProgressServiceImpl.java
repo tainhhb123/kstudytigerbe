@@ -6,6 +6,8 @@ import org.example.ktigerstudybe.repository.UserProgressRepository;
 import org.example.ktigerstudybe.service.userprocess.UserProgressService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -31,6 +33,12 @@ public class UserProgressServiceImpl implements UserProgressService {
     public UserProgressResponse getProgressByUserId(Long userId) {
         UserProgress up = userProgressRepository.findByUserId(userId);
         return mapToDto(up);
+    }
+
+    @Override
+    public Page<UserProgressResponse> getAllUserProgress(Pageable pageable) {
+        return userProgressRepository.findAllProgress(pageable)
+                .map(this::mapToDto);
     }
 
     @Override

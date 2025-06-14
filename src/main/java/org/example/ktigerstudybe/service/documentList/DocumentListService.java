@@ -2,7 +2,8 @@ package org.example.ktigerstudybe.service.documentList;
 
 import org.example.ktigerstudybe.dto.req.DocumentListRequest;
 import org.example.ktigerstudybe.dto.resp.DocumentListResponse;
-
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import java.util.List;
 
 public interface DocumentListService {
@@ -30,4 +31,8 @@ public interface DocumentListService {
 
     // Tìm kiếm DocumentList theo tiêu đề
     List<DocumentListResponse> searchByTitle(String keyword);
+
+
+    Page<DocumentListResponse> listByUser(Long userId, Pageable pg);
+    Page<DocumentListResponse> searchPublic(String keyword, Pageable pageable);
 }

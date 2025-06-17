@@ -4,6 +4,7 @@ package org.example.ktigerstudybe.repository;
 import org.example.ktigerstudybe.model.DocumentList;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Range;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -26,4 +27,22 @@ public interface DocumentListRepository extends JpaRepository<DocumentList, Long
 
     // Lấy toàn bộ public lists không phân trang
     List<DocumentList> findAllByIsPublic(int isPublic);
+<<<<<<< HEAD
+=======
+
+    //admin
+    Page<DocumentList> findByIsPublicAndTitleContainingIgnoreCase(
+            int isPublic, String keyword, Pageable pageable);
+
+    Page<DocumentList> findByUser_UserIdAndIsPublic(
+            Long userId, int isPublic, Pageable pageable);
+
+    Page<DocumentList> findByIsPublicAndTitleContainingIgnoreCaseOrIsPublicAndUser_FullNameContainingIgnoreCase(
+            int isPublic, String titleKeyword,
+            int isPublic2, String nameKeyword,
+            Pageable pageable
+    );
+
+
+>>>>>>> 043d82fc619c445365b357951234f8586a1139d0
 }

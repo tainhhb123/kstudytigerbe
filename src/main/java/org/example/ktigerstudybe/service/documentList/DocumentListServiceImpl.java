@@ -155,4 +155,25 @@ public class DocumentListServiceImpl implements DocumentListService {
         }
         return map;
     }
+
+    //Admin
+    @Override
+    public Page<DocumentListResponse> listByUser(Long userId, Pageable pg) {
+        return documentListRepository
+                .findByUser_UserIdAndIsPublic(userId, 1, pg)
+                .map(this::toResponse);
+    }
+
+    @Override
+    public Page<DocumentListResponse> searchPublic(String keyword, Pageable pageable) {
+        String kw = keyword == null ? "" : keyword.trim();
+        return documentListRepository
+                .findByIsPublicAndTitleContainingIgnoreCaseOrIsPublicAndUser_FullNameContainingIgnoreCase(
+                        1, kw,
+                        1, kw,
+                        pageable
+                )
+                .map(this::toResponse);
+    }
+
 }

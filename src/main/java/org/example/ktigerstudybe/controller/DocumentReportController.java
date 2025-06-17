@@ -1,9 +1,10 @@
 package org.example.ktigerstudybe.controller;
 
+import lombok.RequiredArgsConstructor;
 import org.example.ktigerstudybe.dto.req.DocumentReportRequest;
 import org.example.ktigerstudybe.dto.resp.DocumentReportResponse;
 import org.example.ktigerstudybe.service.documentReport.DocumentReportService;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -11,54 +12,63 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/document-reports")
+@RequiredArgsConstructor
 public class DocumentReportController {
+    private final DocumentReportService documentReportService;
 
-    @Autowired
-    private DocumentReportService documentReportService;
-
-    // Lấy tất cả các báo cáo
+    // Non-paginated endpoints
     @GetMapping
     public List<DocumentReportResponse> getAllReports() {
         return documentReportService.getAllReports();
     }
 
-    // Lấy báo cáo theo ID
     @GetMapping("/{id}")
     public ResponseEntity<DocumentReportResponse> getReportById(@PathVariable Long id) {
-        try {
-            DocumentReportResponse response = documentReportService.getReportById(id);
-            return ResponseEntity.ok(response);
-        } catch (Exception e) {
-            return ResponseEntity.notFound().build();
-        }
+        return ResponseEntity.ok(documentReportService.getReportById(id));
     }
 
-    // Tạo mới một báo cáo
     @PostMapping
-    public DocumentReportResponse createReport(@RequestBody DocumentReportRequest request) {
-        return documentReportService.createReport(request);
+    public ResponseEntity<DocumentReportResponse> createReport(@RequestBody DocumentReportRequest request) {
+        return ResponseEntity.ok(documentReportService.createReport(request));
     }
 
-    // Xóa một báo cáo
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteReport(@PathVariable Long id) {
-        try {
-            documentReportService.deleteReport(id);
-            return ResponseEntity.noContent().build();
-        } catch (Exception e) {
-            return ResponseEntity.notFound().build();
-        }
+        documentReportService.deleteReport(id);
+        return ResponseEntity.noContent().build();
     }
 
-    // Lấy các báo cáo theo userId
     @GetMapping("/user/{userId}")
     public List<DocumentReportResponse> getReportsByUserId(@PathVariable Long userId) {
         return documentReportService.getReportsByUserId(userId);
     }
 
-    // Lấy các báo cáo theo listId (ID tài liệu)
     @GetMapping("/document/{listId}")
     public List<DocumentReportResponse> getReportsByListId(@PathVariable Long listId) {
         return documentReportService.getReportsByListId(listId);
+    }
+
+    // Paginated endpoints (avoid collision by adding "/paged")
+    @GetMapping("/paged")
+    public ResponseEntity<Page<DocumentReportResponse>> getPagedReports(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        return ResponseEntity.ok(documentReportService.getAllReports(page, size));
+    }
+
+    @GetMapping("/user/{userId}/paged")
+    public ResponseEntity<Page<DocumentReportResponse>> getPagedReportsByUser(
+            @PathVariable Long userId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        return ResponseEntity.ok(documentReportService.getReportsByUserId(userId, page, size));
+    }
+
+    @GetMapping("/document/{listId}/paged")
+    public ResponseEntity<Page<DocumentReportResponse>> getPagedReportsByDocument(
+            @PathVariable Long listId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        return ResponseEntity.ok(documentReportService.getReportsByListId(listId, page, size));
     }
 }

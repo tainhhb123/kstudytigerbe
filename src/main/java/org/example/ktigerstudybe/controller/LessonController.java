@@ -4,6 +4,7 @@ import org.example.ktigerstudybe.dto.req.LessonRequest;
 import org.example.ktigerstudybe.dto.resp.LessonResponse;
 import org.example.ktigerstudybe.service.lesson.LessonService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -59,7 +60,18 @@ public class LessonController {
     }
 
 
-    //
+    //admin
+    // GET paginated + search (Page)
+    @GetMapping("/paged")
+    public ResponseEntity<Page<LessonResponse>> getLessonsPaged(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "15") int size,
+            @RequestParam(required = false) Long levelId,
+            @RequestParam(required = false) String keyword
+    ) {
+        Page<LessonResponse> result = lessonService.getLessons(page, size, levelId, keyword);
+        return ResponseEntity.ok(result);
+    }
 
 
 }

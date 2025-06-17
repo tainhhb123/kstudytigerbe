@@ -60,4 +60,9 @@ public interface DocumentListService {
      * Nhóm các bộ flashcard theo type, mỗi nhóm tối đa 'limit' phần tử
      */
     Map<String, List<DocumentListResponse>> getGroupedByType(int limit);
+
+
+    //admin
+    Page<DocumentListResponse> listByUser(Long userId, Pageable pg);
+    Page<DocumentListResponse> searchPublic(String keyword, Pageable pageable);
 }

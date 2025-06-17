@@ -8,6 +8,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -47,4 +49,12 @@ public class DocumentList {
     protected void onCreate() {
         this.createdAt = LocalDateTime.now();
     }
+
+
+    @OneToMany(
+            mappedBy = "documentList",
+            cascade = CascadeType.REMOVE,
+            orphanRemoval = true
+    )
+    private List<DocumentReport> reports = new ArrayList<>();
 }

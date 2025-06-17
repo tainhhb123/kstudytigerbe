@@ -27,8 +27,7 @@ public interface DocumentListRepository extends JpaRepository<DocumentList, Long
 
     // Lấy toàn bộ public lists không phân trang
     List<DocumentList> findAllByIsPublic(int isPublic);
-<<<<<<< HEAD
-=======
+
 
     //admin
     Page<DocumentList> findByIsPublicAndTitleContainingIgnoreCase(
@@ -44,5 +43,4 @@ public interface DocumentListRepository extends JpaRepository<DocumentList, Long
     );
 
 
->>>>>>> 043d82fc619c445365b357951234f8586a1139d0
 }

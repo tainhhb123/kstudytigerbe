@@ -31,10 +31,12 @@ public class DocumentListServiceImpl implements DocumentListService {
     private final DocumentListMapper mapper;
 
     @Autowired
-    public DocumentListServiceImpl(DocumentListRepository documentListRepository,
-                                   UserRepository userRepository,
-                                   DocumentItemRepository documentItemRepository,
-                                   DocumentListMapper mapper) {
+    public DocumentListServiceImpl(
+            DocumentListRepository documentListRepository,
+            UserRepository userRepository,
+            DocumentItemRepository documentItemRepository,
+            DocumentListMapper mapper
+    ) {
         this.documentListRepository = documentListRepository;
         this.userRepository = userRepository;
         this.documentItemRepository = documentItemRepository;
@@ -45,7 +47,9 @@ public class DocumentListServiceImpl implements DocumentListService {
     @Transactional
     public DocumentListResponse createDocumentList(DocumentListRequest request) {
         User user = userRepository.findById(request.getUserId())
-                .orElseThrow(() -> new IllegalArgumentException("User not found: " + request.getUserId()));
+                .orElseThrow(() ->
+                        new IllegalArgumentException("User not found: " + request.getUserId())
+                );
 
         DocumentList list = DocumentList.builder()
                 .user(user)
@@ -81,7 +85,6 @@ public class DocumentListServiceImpl implements DocumentListService {
 
     @Override
     public List<DocumentListResponse> getPublicLists() {
-        // Không phân trang: is_public = 0
         return documentListRepository.findAllByIsPublic(0)
                 .stream()
                 .map(mapper::toResponse)
@@ -90,7 +93,6 @@ public class DocumentListServiceImpl implements DocumentListService {
 
     @Override
     public Page<DocumentListResponse> getPublicLists(Pageable pageable) {
-        // Phân trang: is_public = 0
         return documentListRepository.findByIsPublic(0, pageable)
                 .map(mapper::toResponse);
     }
@@ -98,7 +100,9 @@ public class DocumentListServiceImpl implements DocumentListService {
     @Override
     public DocumentListResponse getDocumentListById(Long id) {
         DocumentList e = documentListRepository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("DocumentList not found: " + id));
+                .orElseThrow(() ->
+                        new NoSuchElementException("DocumentList not found: " + id)
+                );
         return mapper.toResponse(e);
     }
 
@@ -106,8 +110,9 @@ public class DocumentListServiceImpl implements DocumentListService {
     @Transactional
     public DocumentListResponse updateDocumentList(Long id, DocumentListRequest req) {
         DocumentList e = documentListRepository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("DocumentList not found: " + id));
-
+                .orElseThrow(() ->
+                        new NoSuchElementException("DocumentList not found: " + id)
+                );
         e.setTitle(req.getTitle());
         e.setDescription(req.getDescription());
         e.setType(req.getType());
@@ -156,24 +161,22 @@ public class DocumentListServiceImpl implements DocumentListService {
         return map;
     }
 
-    //Admin
     @Override
     public Page<DocumentListResponse> listByUser(Long userId, Pageable pg) {
         return documentListRepository
                 .findByUser_UserIdAndIsPublic(userId, 1, pg)
-                .map(this::toResponse);
+                .map(mapper::toResponse);
     }
 
     @Override
     public Page<DocumentListResponse> searchPublic(String keyword, Pageable pageable) {
-        String kw = keyword == null ? "" : keyword.trim();
+        String kw = (keyword == null ? "" : keyword.trim());
         return documentListRepository
                 .findByIsPublicAndTitleContainingIgnoreCaseOrIsPublicAndUser_FullNameContainingIgnoreCase(
                         1, kw,
                         1, kw,
                         pageable
                 )
-                .map(this::toResponse);
+                .map(mapper::toResponse);
     }
-
 }

@@ -2,6 +2,7 @@ package org.example.ktigerstudybe.service.documentReport;
 
 import org.example.ktigerstudybe.dto.req.DocumentReportRequest;
 import org.example.ktigerstudybe.dto.resp.DocumentReportResponse;
+import org.springframework.data.domain.Page;
 
 import java.util.List;
 
@@ -24,4 +25,9 @@ public interface DocumentReportService {
 
     // Lấy danh sách báo cáo theo tài liệu
     List<DocumentReportResponse> getReportsByListId(Long listId);
+
+    //Admin
+    Page<DocumentReportResponse> getAllReports(int page, int size);
+    Page<DocumentReportResponse> getReportsByUserId(Long userId, int page, int size); // NEW
+    Page<DocumentReportResponse> getReportsByListId(Long listId, int page, int size);
 }

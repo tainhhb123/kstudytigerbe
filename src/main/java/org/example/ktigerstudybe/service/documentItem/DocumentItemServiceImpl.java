@@ -7,6 +7,8 @@ import org.example.ktigerstudybe.model.DocumentList;
 import org.example.ktigerstudybe.repository.DocumentItemRepository;
 import org.example.ktigerstudybe.repository.DocumentListRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -100,4 +102,20 @@ public class DocumentItemServiceImpl implements DocumentItemService {
     public void deleteDocumentItemsByListId(Long listId) {
         documentItemRepository.deleteByDocumentList_ListId(listId);
     }
+
+    @Override
+    public Page<DocumentItemResponse> getDocumentItemsPaged(
+            Long listId, String keyword, Pageable pageable) {
+        String kw = keyword == null ? "" : keyword.trim();
+        Page<DocumentItem> page;
+        if (kw.isEmpty()) {
+            page = documentItemRepository.findByDocumentList_ListId(listId, pageable);
+        } else {
+            page = documentItemRepository.findByDocumentList_ListIdAndWordContainingIgnoreCase(
+                    listId, kw, pageable
+            );
+        }
+        return page.map(this::toResponse);
+    }
+
 }

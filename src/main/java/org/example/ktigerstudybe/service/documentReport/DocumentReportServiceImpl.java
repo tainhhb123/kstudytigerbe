@@ -9,7 +9,11 @@ import org.example.ktigerstudybe.model.User;
 import org.example.ktigerstudybe.repository.DocumentListRepository;
 import org.example.ktigerstudybe.repository.DocumentReportRepository;
 import org.example.ktigerstudybe.repository.UserRepository;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.Optional;
@@ -77,6 +81,30 @@ public class DocumentReportServiceImpl implements DocumentReportService {
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());
     }
+
+
+    //Admin
+    @Override
+    public Page<DocumentReportResponse> getAllReports(int page, int size) { // NEW: paginated fetch
+        Pageable pageable = PageRequest.of(page, size, Sort.by("reportDate").descending());
+        return documentReportRepository.findAll(pageable)
+                .map(this::mapToResponse);
+    }
+
+    @Override
+    public Page<DocumentReportResponse> getReportsByUserId(Long userId, int page, int size) { // NEW
+        Pageable pageable = PageRequest.of(page, size, Sort.by("reportDate").descending());
+        return documentReportRepository.findByUser_UserId(userId, pageable)
+                .map(this::mapToResponse);
+    }
+
+    @Override
+    public Page<DocumentReportResponse> getReportsByListId(Long listId, int page, int size) { // NEW
+        Pageable pageable = PageRequest.of(page, size, Sort.by("reportDate").descending());
+        return documentReportRepository.findByDocumentList_ListId(listId, pageable)
+                .map(this::mapToResponse);
+    }
+
 
     private DocumentReportResponse mapToResponse(DocumentReport report) {
         return DocumentReportResponse.builder()

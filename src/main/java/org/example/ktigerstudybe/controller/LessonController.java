@@ -2,6 +2,7 @@ package org.example.ktigerstudybe.controller;
 
 import org.example.ktigerstudybe.dto.req.LessonRequest;
 import org.example.ktigerstudybe.dto.resp.LessonResponse;
+import org.example.ktigerstudybe.dto.resp.LessonWithProgressResponse;
 import org.example.ktigerstudybe.service.lesson.LessonService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -58,7 +59,13 @@ public class LessonController {
         return ResponseEntity.noContent().build();
     }
 
-
+    @GetMapping("/progress")
+    public List<LessonWithProgressResponse> getLessonsWithProgress(
+            @RequestParam Long levelId,
+            @RequestParam Long userId
+    ) {
+        return lessonService.getLessonsWithProgress(levelId, userId);
+    }
     //
 
 

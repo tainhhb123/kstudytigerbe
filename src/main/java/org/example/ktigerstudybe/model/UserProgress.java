@@ -1,31 +1,35 @@
 package org.example.ktigerstudybe.model;
 
 import jakarta.persistence.*;
-import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
+@Entity
+@Table(name = "user_progress")
 @Getter
 @Setter
-@Data
-@Entity
-@Table(name = "UserProgress")
+@NoArgsConstructor
+@AllArgsConstructor
 public class UserProgress {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "progress_id") // tên đúng với DB
     private Long progressId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "UserID", referencedColumnName = "UserID")
+    @JoinColumn(name = "UserID")
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "LessonID", referencedColumnName = "LessonID")
+    @JoinColumn(name = "LessonID")
     private Lesson lesson;
 
     @Column(name = "LastAccessed")
-    private LocalDate lastAccessed;
+    private LocalDateTime lastAccessed;
+
+    @Column(name = "IsLessonCompleted")
+    private Boolean isLessonCompleted = false;
 }
+

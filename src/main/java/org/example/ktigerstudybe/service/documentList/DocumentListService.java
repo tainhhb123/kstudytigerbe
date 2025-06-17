@@ -1,38 +1,61 @@
+// src/main/java/org/example/ktigerstudybe/service/documentList/DocumentListService.java
 package org.example.ktigerstudybe.service.documentList;
 
 import org.example.ktigerstudybe.dto.req.DocumentListRequest;
 import org.example.ktigerstudybe.dto.resp.DocumentListResponse;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+
 import java.util.List;
+import java.util.Map;
 
 public interface DocumentListService {
 
-    // Lấy tất cả các DocumentList
-    List<DocumentListResponse> getAllDocumentLists();
-
-    // Lấy DocumentList theo ID
-    DocumentListResponse getDocumentListById(Long listId);
-
-    // Tạo mới một DocumentList
+    /**
+     * Tạo mới một bộ flashcard
+     */
     DocumentListResponse createDocumentList(DocumentListRequest request);
 
-    // Cập nhật thông tin DocumentList
-    DocumentListResponse updateDocumentList(Long listId, DocumentListRequest request);
+    /**
+     * Lấy về toàn bộ bộ flashcard
+     */
+    List<DocumentListResponse> getAllDocumentLists();
 
-    // Xóa DocumentList theo ID
-    void deleteDocumentList(Long listId);
+    /**
+     * Lấy chi tiết bộ flashcard theo ID
+     */
+    DocumentListResponse getDocumentListById(Long id);
 
-    // Lấy các DocumentList theo userId
+    /**
+     * Cập nhật bộ flashcard theo ID
+     */
+    DocumentListResponse updateDocumentList(Long id, DocumentListRequest request);
+
+    /**
+     * Xóa bộ flashcard theo ID
+     */
+    void deleteDocumentList(Long id);
+
+    /**
+     * Lấy các bộ flashcard của một user
+     */
     List<DocumentListResponse> getDocumentListsByUserId(Long userId);
 
-    // Lấy các DocumentList công khai
-    List<DocumentListResponse> getPublicDocumentLists();
+    /**
+     * Lấy các bộ flashcard công khai (is_public = 0)
+     */
+    List<DocumentListResponse> getPublicLists();
 
-    // Tìm kiếm DocumentList theo tiêu đề
-    List<DocumentListResponse> searchByTitle(String keyword);
+    /**
+     * Lấy các bộ flashcard theo type, và có thể filter isPublic (0 hoặc 1)
+     */
+    List<DocumentListResponse> getByTypeAndPublic(String type, int isPublic);
 
+    /**
+     * Lấy danh sách các giá trị type duy nhất
+     */
+    List<String> getDistinctTypes();
 
-    Page<DocumentListResponse> listByUser(Long userId, Pageable pg);
-    Page<DocumentListResponse> searchPublic(String keyword, Pageable pageable);
+    /**
+     * Nhóm các bộ flashcard theo type, mỗi nhóm tối đa 'limit' phần tử
+     */
+    Map<String, List<DocumentListResponse>> getGroupedByType(int limit);
 }

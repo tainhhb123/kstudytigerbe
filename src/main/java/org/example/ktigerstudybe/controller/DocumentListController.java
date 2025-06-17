@@ -5,107 +5,97 @@ import org.example.ktigerstudybe.dto.req.DocumentListRequest;
 import org.example.ktigerstudybe.dto.resp.DocumentListResponse;
 import org.example.ktigerstudybe.service.documentList.DocumentListService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PageableDefault;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/document-lists")
 public class DocumentListController {
 
+    private final DocumentListService service;
+
     @Autowired
-    private DocumentListService documentListService;
-
-    // Unpaged: get all
-    @GetMapping
-    public List<DocumentListResponse> getAllDocumentLists() {
-        return documentListService.getAllDocumentLists();
+    public DocumentListController(DocumentListService service) {
+        this.service = service;
     }
 
-    // Unpaged: get by id
-    @GetMapping("/{id}")
-    public ResponseEntity<DocumentListResponse> getDocumentListById(@PathVariable Long id) {
-        try {
-            return ResponseEntity.ok(documentListService.getDocumentListById(id));
-        } catch (Exception e) {
-            return ResponseEntity.notFound().build();
-        }
-    }
-
-    // Create
-    @PostMapping
-    public DocumentListResponse createDocumentList(@RequestBody DocumentListRequest request) {
-        return documentListService.createDocumentList(request);
-    }
-
-    // Update
-    @PutMapping("/{id}")
-    public ResponseEntity<DocumentListResponse> updateDocumentList(
-            @PathVariable Long id,
-            @RequestBody DocumentListRequest request) {
-        try {
-            return ResponseEntity.ok(documentListService.updateDocumentList(id, request));
-        } catch (Exception e) {
-            return ResponseEntity.notFound().build();
-        }
-    }
-
-    // Delete
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteDocumentList(@PathVariable Long id) {
-        documentListService.deleteDocumentList(id);
-        return ResponseEntity.noContent().build();
-    }
-
-    // Unpaged: get lists by user
-    @GetMapping("/user/{userId}")
-    public List<DocumentListResponse> getDocumentListsByUserId(@PathVariable Long userId) {
-        return documentListService.getDocumentListsByUserId(userId);
-    }
-
-    // Unpaged: get public lists
+    /**
+     * 1) Lấy tất cả các bộ public (is_public = 0)
+     */
     @GetMapping("/public")
-    public List<DocumentListResponse> getPublicDocumentLists() {
-        return documentListService.getPublicDocumentLists();
+    public List<DocumentListResponse> getPublicLists() {
+        return service.getPublicLists();
     }
 
-    // Unpaged: search by title
-    @GetMapping("/search")
-    public List<DocumentListResponse> searchByTitle(@RequestParam String keyword) {
-        return documentListService.searchByTitle(keyword);
+    /**
+     * 2) Lấy danh sách các loại (distinct types)
+     */
+    @GetMapping("/distinct-types")
+    public List<String> getDistinctTypes() {
+        return service.getDistinctTypes();
     }
 
+    /**
+     * 3) Lấy grouped theo type, mỗi type tối đa 4 items
+     */
+    @GetMapping("/grouped")
+    public Map<String, List<DocumentListResponse>> getGroupedByType() {
+        return service.getGroupedByType(4);
+    }
 
-
-    // Paged: public with optional search
-    @GetMapping("/public/paged")
-    public Page<DocumentListResponse> getPublicPaged(
-            @RequestParam(required = false, defaultValue = "") String keyword,
-            @PageableDefault(size = 10) Pageable pageable
+    /**
+     * 4) Lấy theo type, filter isPublic (mặc định 0 = public)
+     */
+    @GetMapping("/type/{type}")
+    public List<DocumentListResponse> getByTypeAndPublic(
+            @PathVariable String type,
+            @RequestParam(defaultValue = "0") int isPublic
     ) {
-        return documentListService.searchPublic(keyword, pageable);
+        return service.getByTypeAndPublic(type, isPublic);
     }
 
-    // Paged: lists by user
-    @GetMapping("/user/{userId}/paged")
-    public Page<DocumentListResponse> getByUserPaged(
-            @PathVariable Long userId,
-            @PageableDefault(size = 5) Pageable pageable
-    ) {
-        return documentListService.listByUser(userId, pageable);
+    /**
+     * 5) Lấy theo userId
+     */
+    @GetMapping("/user/{userId}")
+    public List<DocumentListResponse> getByUser(@PathVariable Long userId) {
+        return service.getDocumentListsByUserId(userId);
     }
 
-    // Paged: lists by user + search
-    @GetMapping("/user/{userId}/search/paged")
-    public Page<DocumentListResponse> searchByUserPaged(
-            @PathVariable Long userId,
-            @RequestParam String keyword,
-            @PageableDefault(size = 10) Pageable pageable
+    /**
+     * 6) Lấy chi tiết theo id (chỉ khớp số)
+     */
+    @GetMapping("/{id:\\d+}")
+    public DocumentListResponse getById(@PathVariable Long id) {
+        return service.getDocumentListById(id);
+    }
+
+    /**
+     * 7) Tạo mới
+     */
+    @PostMapping
+    public DocumentListResponse create(@RequestBody DocumentListRequest request) {
+        return service.createDocumentList(request);
+    }
+
+    /**
+     * 8) Cập nhật theo id (chỉ khớp số)
+     */
+    @PutMapping("/{id:\\d+}")
+    public DocumentListResponse update(
+            @PathVariable Long id,
+            @RequestBody DocumentListRequest request
     ) {
-        return documentListService.searchPublic(keyword, pageable);
+        return service.updateDocumentList(id, request);
+    }
+
+    /**
+     * 9) Xóa theo id (chỉ khớp số)
+     */
+    @DeleteMapping("/{id:\\d+}")
+    public void delete(@PathVariable Long id) {
+        service.deleteDocumentList(id);
     }
 }

@@ -1,7 +1,6 @@
+// src/main/java/org/example/ktigerstudybe/service/documentList/DocumentListServiceImpl.java
 package org.example.ktigerstudybe.service.documentList;
 
-import jakarta.transaction.Transactional;
-import org.example.ktigerstudybe.dto.req.DocumentItemRequest;
 import org.example.ktigerstudybe.dto.req.DocumentListRequest;
 import org.example.ktigerstudybe.dto.resp.DocumentListResponse;
 import org.example.ktigerstudybe.model.DocumentItem;
@@ -12,10 +11,12 @@ import org.example.ktigerstudybe.repository.DocumentListRepository;
 import org.example.ktigerstudybe.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
 @Service
@@ -23,55 +24,39 @@ public class DocumentListServiceImpl implements DocumentListService {
 
     private final DocumentListRepository documentListRepository;
     private final UserRepository userRepository;
-
     private final DocumentItemRepository documentItemRepository;
 
-
-
     @Autowired
-    public DocumentListServiceImpl(DocumentListRepository documentListRepository, UserRepository userRepository,  DocumentItemRepository documentItemRepository) {
+    public DocumentListServiceImpl(DocumentListRepository documentListRepository,
+                                   UserRepository userRepository,
+                                   DocumentItemRepository documentItemRepository) {
         this.documentListRepository = documentListRepository;
         this.userRepository = userRepository;
         this.documentItemRepository = documentItemRepository;
     }
 
-    // DTO → Entity
-    private DocumentList toEntity(DocumentListRequest request) {
-        User user = userRepository.findById(request.getUserId())
-                .orElseThrow(() -> new IllegalArgumentException("User not found with ID: " + request.getUserId()));
-
-        DocumentList entity = new DocumentList();
-        entity.setUser(user);
-        entity.setTitle(request.getTitle());
-        entity.setDescription(request.getDescription());
-        entity.setType(request.getType());
-        entity.setCreatedAt(request.getCreatedAt());
-        entity.setIsPublic(request.getIsPublic());
-        return entity;
-    }
-
-    // Entity → DTO
-    private DocumentListResponse toResponse(DocumentList entity) {
-        DocumentListResponse resp = new DocumentListResponse();
-        resp.setListId(entity.getListId());
-        resp.setUserId(entity.getUser().getUserId());
-        resp.setFullName(entity.getUser().getFullName());
-        resp.setTitle(entity.getTitle());
-        resp.setDescription(entity.getDescription());
-        resp.setType(entity.getType());
-        resp.setCreatedAt(entity.getCreatedAt());
-        resp.setIsPublic(entity.getIsPublic());
-        return resp;
+    /** Chuyển DocumentList entity → DTO */
+    private DocumentListResponse toResponse(DocumentList e) {
+        DocumentListResponse r = new DocumentListResponse();
+        r.setListId(e.getListId());
+        r.setUserId(e.getUser().getUserId());
+        r.setFullName(e.getUser().getFullName());
+        r.setAvatarImage(e.getUser().getAvatarImage());
+        r.setTitle(e.getTitle());
+        r.setDescription(e.getDescription());
+        r.setType(e.getType());
+        r.setCreatedAt(e.getCreatedAt());
+        r.setIsPublic(e.getIsPublic());
+        return r;
     }
 
     @Override
     @Transactional
     public DocumentListResponse createDocumentList(DocumentListRequest request) {
-        // 1. Kiểm tra và lấy User
         User user = userRepository.findById(request.getUserId())
-                .orElseThrow(() -> new IllegalArgumentException("User không tồn tại với ID: " + request.getUserId()));
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "User not found: " + request.getUserId()));
 
-        // 2. Tạo và lưu DocumentList
         DocumentList list = DocumentList.builder()
                 .user(user)
                 .title(request.getTitle())
@@ -81,9 +66,8 @@ public class DocumentListServiceImpl implements DocumentListService {
                 .build();
         list = documentListRepository.save(list);
 
-        // 3. Duyệt và lưu từng DocumentItem (nếu có)
-        if (request.getItems() != null && !request.getItems().isEmpty()) {
-            for (DocumentItemRequest it : request.getItems()) {
+        if (request.getItems() != null) {
+            for (var it : request.getItems()) {
                 DocumentItem item = DocumentItem.builder()
                         .documentList(list)
                         .word(it.getWord())
@@ -95,97 +79,91 @@ public class DocumentListServiceImpl implements DocumentListService {
             }
         }
 
-        // 4. Chuyển sang DTO và trả về
         return toResponse(list);
     }
 
     @Override
     public List<DocumentListResponse> getAllDocumentLists() {
-        return documentListRepository.findAll().stream()
-                .map(this::toResponse)
-                .collect(Collectors.toList());
-    }
-
-    @Override
-    public DocumentListResponse getDocumentListById(Long listId) {
-        DocumentList entity = documentListRepository.findById(listId)
-                .orElseThrow(() -> new IllegalArgumentException("DocumentList not found with ID: " + listId));
-        return toResponse(entity);
-    }
-
-    @Override
-    public DocumentListResponse updateDocumentList(Long listId, DocumentListRequest request) {
-        DocumentList entity = documentListRepository.findById(listId)
-                .orElseThrow(() -> new IllegalArgumentException("DocumentList not found with ID: " + listId));
-
-        User user = userRepository.findById(request.getUserId())
-                .orElseThrow(() -> new IllegalArgumentException("User not found with ID: " + request.getUserId()));
-
-        entity.setUser(user);
-        entity.setTitle(request.getTitle());
-        entity.setDescription(request.getDescription());
-        entity.setType(request.getType());
-        entity.setCreatedAt(request.getCreatedAt());
-        entity.setIsPublic(request.getIsPublic());
-
-        entity = documentListRepository.save(entity);
-        return toResponse(entity);
-    }
-
-    @Override
-    public void deleteDocumentList(Long listId) {
-        if (!documentListRepository.existsById(listId)) {
-            throw new IllegalArgumentException("Cannot delete: DocumentList not found with ID: " + listId);
-        }
-        documentListRepository.deleteById(listId);
-    }
-
-    @Override
-    public List<DocumentListResponse> getDocumentListsByUserId(Long userId) {
-        return documentListRepository.findByUser_UserId(userId).stream()
-                .map(this::toResponse)
-                .collect(Collectors.toList());
-    }
-
-    @Override
-    public List<DocumentListResponse> getPublicDocumentLists() {
-        return documentListRepository.findByIsPublic(1).stream()
-                .map(this::toResponse)
-                .collect(Collectors.toList());
-    }
-
-    @Override
-    public List<DocumentListResponse> searchByTitle(String keyword) {
-        return documentListRepository
-                .findByTitleContainingIgnoreCaseAndIsPublic(keyword, 1)
+        return documentListRepository.findAll()
                 .stream()
                 .map(this::toResponse)
                 .collect(Collectors.toList());
     }
 
-    //Admin
-
     @Override
-    public Page<DocumentListResponse> listByUser(Long userId, Pageable pg) {
-        return documentListRepository
-                .findByUser_UserIdAndIsPublic(userId, 1, pg)
-                .map(this::toResponse);
+    public DocumentListResponse getDocumentListById(Long id) {
+        DocumentList e = documentListRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException(
+                        "DocumentList not found: " + id));
+        return toResponse(e);
     }
 
     @Override
-    public Page<DocumentListResponse> searchPublic(String keyword, Pageable pageable) {
-        String kw = keyword == null ? "" : keyword.trim();
-        return documentListRepository
-                .findByIsPublicAndTitleContainingIgnoreCaseOrIsPublicAndUser_FullNameContainingIgnoreCase(
-                        1, kw,
-                        1, kw,
-                        pageable
-                )
-                .map(this::toResponse);
+    public DocumentListResponse updateDocumentList(Long id, DocumentListRequest req) {
+        DocumentList e = documentListRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException(
+                        "DocumentList not found: " + id));
+        e.setTitle(req.getTitle());
+        e.setDescription(req.getDescription());
+        e.setType(req.getType());
+        e.setIsPublic(req.getIsPublic());
+        // Note: createdAt is set once at persist
+        DocumentList updated = documentListRepository.save(e);
+        return toResponse(updated);
     }
 
+    @Override
+    public void deleteDocumentList(Long id) {
+        if (!documentListRepository.existsById(id)) {
+            throw new NoSuchElementException(
+                    "Cannot delete, not found: " + id);
+        }
+        documentListRepository.deleteById(id);
+    }
 
+    @Override
+    public List<DocumentListResponse> getDocumentListsByUserId(Long userId) {
+        return documentListRepository.findByUser_UserId(userId)
+                .stream()
+                .map(this::toResponse)
+                .collect(Collectors.toList());
+    }
 
+    @Override
+    public List<DocumentListResponse> getPublicLists() {
+        // isPublic == 0 xem là public
+        return documentListRepository.findAllByIsPublic(0)
+                .stream()
+                .map(this::toResponse)
+                .collect(Collectors.toList());
+    }
 
+    @Override
+    public List<DocumentListResponse> getByTypeAndPublic(String type, int isPublic) {
+        return documentListRepository.findByTypeAndIsPublic(type, isPublic)
+                .stream()
+                .map(this::toResponse)
+                .collect(Collectors.toList());
+    }
 
+    @Override
+    public List<String> getDistinctTypes() {
+        return documentListRepository.findDistinctTypes();
+    }
+
+    @Override
+    public Map<String, List<DocumentListResponse>> getGroupedByType(int limit) {
+        List<String> types = getDistinctTypes();
+        Map<String, List<DocumentListResponse>> map = new LinkedHashMap<>();
+        for (String t : types) {
+            List<DocumentListResponse> slice = documentListRepository
+                    .findByTypeAndIsPublic(t, 0)
+                    .stream()
+                    .limit(limit)
+                    .map(this::toResponse)
+                    .collect(Collectors.toList());
+            map.put(t, slice);
+        }
+        return map;
+    }
 }

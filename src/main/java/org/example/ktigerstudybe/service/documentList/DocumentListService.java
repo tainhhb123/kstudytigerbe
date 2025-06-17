@@ -3,6 +3,8 @@ package org.example.ktigerstudybe.service.documentList;
 
 import org.example.ktigerstudybe.dto.req.DocumentListRequest;
 import org.example.ktigerstudybe.dto.resp.DocumentListResponse;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.Map;
@@ -58,4 +60,9 @@ public interface DocumentListService {
      * Nhóm các bộ flashcard theo type, mỗi nhóm tối đa 'limit' phần tử
      */
     Map<String, List<DocumentListResponse>> getGroupedByType(int limit);
+
+
+    //admin
+    Page<DocumentListResponse> listByUser(Long userId, Pageable pg);
+    Page<DocumentListResponse> searchPublic(String keyword, Pageable pageable);
 }

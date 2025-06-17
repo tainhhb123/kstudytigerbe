@@ -80,22 +80,22 @@ public class LessonServiceImpl implements LessonService {
                 .collect(Collectors.toList());
     }
 
-
-   // admin
-   @Override
-   public Page<LessonResponse> getLessons(int page, int size, Long levelId, String keyword) {
-       Pageable pageable = PageRequest.of(page, size, Sort.by("lessonName").ascending());
-       Page<Lesson> pageData;
-       if (levelId != null && keyword != null && !keyword.isEmpty()) {
-           pageData = lessonRepository.findByLessonNameContainingIgnoreCaseAndLevel_LevelId(
-                   keyword, levelId, pageable);
-       } else if (levelId != null) {
-           pageData = lessonRepository.findByLevel_LevelId(levelId, pageable);
-       } else if (keyword != null && !keyword.isEmpty()) {
-           pageData = lessonRepository.findByLessonNameContainingIgnoreCase(keyword, pageable);
-       } else {
-           pageData = lessonRepository.findAll(pageable);
-       }
-       return pageData.map(this::toResponse);
-   }
+    //admin
+    // admin
+    @Override
+    public Page<LessonResponse> getLessons(int page, int size, Long levelId, String keyword) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("lessonName").ascending());
+        Page<Lesson> pageData;
+        if (levelId != null && keyword != null && !keyword.isEmpty()) {
+            pageData = lessonRepository.findByLessonNameContainingIgnoreCaseAndLevel_LevelId(
+                    keyword, levelId, pageable);
+        } else if (levelId != null) {
+            pageData = lessonRepository.findByLevel_LevelId(levelId, pageable);
+        } else if (keyword != null && !keyword.isEmpty()) {
+            pageData = lessonRepository.findByLessonNameContainingIgnoreCase(keyword, pageable);
+        } else {
+            pageData = lessonRepository.findAll(pageable);
+        }
+        return pageData.map(this::toResponse);
+    }
 }

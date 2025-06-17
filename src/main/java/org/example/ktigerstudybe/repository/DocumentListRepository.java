@@ -28,4 +28,5 @@ public interface DocumentListRepository extends JpaRepository<DocumentList, Long
             int isPublic2, String fullNameKeyword,
             Pageable pageable
     );
+
 }

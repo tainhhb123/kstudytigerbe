@@ -1,9 +1,13 @@
 package org.example.ktigerstudybe.service.documentList;
 
+import jakarta.transaction.Transactional;
+import org.example.ktigerstudybe.dto.req.DocumentItemRequest;
 import org.example.ktigerstudybe.dto.req.DocumentListRequest;
 import org.example.ktigerstudybe.dto.resp.DocumentListResponse;
+import org.example.ktigerstudybe.model.DocumentItem;
 import org.example.ktigerstudybe.model.DocumentList;
 import org.example.ktigerstudybe.model.User;
+import org.example.ktigerstudybe.repository.DocumentItemRepository;
 import org.example.ktigerstudybe.repository.DocumentListRepository;
 import org.example.ktigerstudybe.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,10 +24,15 @@ public class DocumentListServiceImpl implements DocumentListService {
     private final DocumentListRepository documentListRepository;
     private final UserRepository userRepository;
 
+    private final DocumentItemRepository documentItemRepository;
+
+
+
     @Autowired
-    public DocumentListServiceImpl(DocumentListRepository documentListRepository, UserRepository userRepository) {
+    public DocumentListServiceImpl(DocumentListRepository documentListRepository, UserRepository userRepository,  DocumentItemRepository documentItemRepository) {
         this.documentListRepository = documentListRepository;
         this.userRepository = userRepository;
+        this.documentItemRepository = documentItemRepository;
     }
 
     // DTO → Entity
@@ -56,10 +65,38 @@ public class DocumentListServiceImpl implements DocumentListService {
     }
 
     @Override
+    @Transactional
     public DocumentListResponse createDocumentList(DocumentListRequest request) {
-        DocumentList entity = toEntity(request);
-        entity = documentListRepository.save(entity);
-        return toResponse(entity);
+        // 1. Kiểm tra và lấy User
+        User user = userRepository.findById(request.getUserId())
+                .orElseThrow(() -> new IllegalArgumentException("User không tồn tại với ID: " + request.getUserId()));
+
+        // 2. Tạo và lưu DocumentList
+        DocumentList list = DocumentList.builder()
+                .user(user)
+                .title(request.getTitle())
+                .description(request.getDescription())
+                .type(request.getType())
+                .isPublic(request.getIsPublic())
+                .build();
+        list = documentListRepository.save(list);
+
+        // 3. Duyệt và lưu từng DocumentItem (nếu có)
+        if (request.getItems() != null && !request.getItems().isEmpty()) {
+            for (DocumentItemRequest it : request.getItems()) {
+                DocumentItem item = DocumentItem.builder()
+                        .documentList(list)
+                        .word(it.getWord())
+                        .meaning(it.getMeaning())
+                        .example(it.getExample())
+                        .vocabImage(it.getVocabImage())
+                        .build();
+                documentItemRepository.save(item);
+            }
+        }
+
+        // 4. Chuyển sang DTO và trả về
+        return toResponse(list);
     }
 
     @Override
@@ -146,5 +183,9 @@ public class DocumentListServiceImpl implements DocumentListService {
                 )
                 .map(this::toResponse);
     }
+
+
+
+
 
 }

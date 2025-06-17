@@ -3,6 +3,7 @@ package org.example.ktigerstudybe.dto.req;
 import lombok.Data;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 public class DocumentListRequest {
@@ -18,4 +19,5 @@ public class DocumentListRequest {
     private LocalDateTime createdAt;
 
     private int isPublic;
+    private List<DocumentItemRequest> items;
 }

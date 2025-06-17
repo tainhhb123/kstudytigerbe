@@ -3,6 +3,8 @@ package org.example.ktigerstudybe.service.documentList;
 
 import org.example.ktigerstudybe.dto.req.DocumentListRequest;
 import org.example.ktigerstudybe.dto.resp.DocumentListResponse;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.Map;
@@ -40,19 +42,19 @@ public interface DocumentListService {
     List<DocumentListResponse> getDocumentListsByUserId(Long userId);
 
     /**
-     * Lấy các bộ flashcard công khai (is_public = 0)
+     * Lấy các bộ flashcard công khai (is_public = 0) không phân trang
      */
     List<DocumentListResponse> getPublicLists();
+
+    /**
+     * Lấy các bộ flashcard công khai (is_public = 0) có phân trang
+     */
+    Page<DocumentListResponse> getPublicLists(Pageable pageable);
 
     /**
      * Lấy các bộ flashcard theo type, và có thể filter isPublic (0 hoặc 1)
      */
     List<DocumentListResponse> getByTypeAndPublic(String type, int isPublic);
-
-    /**
-     * Lấy danh sách các giá trị type duy nhất
-     */
-    List<String> getDistinctTypes();
 
     /**
      * Nhóm các bộ flashcard theo type, mỗi nhóm tối đa 'limit' phần tử

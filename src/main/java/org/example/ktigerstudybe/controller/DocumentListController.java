@@ -5,10 +5,15 @@ import org.example.ktigerstudybe.dto.req.DocumentListRequest;
 import org.example.ktigerstudybe.dto.resp.DocumentListResponse;
 import org.example.ktigerstudybe.service.documentList.DocumentListService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 @RestController
 @RequestMapping("/api/document-lists")
@@ -24,18 +29,24 @@ public class DocumentListController {
     /**
      * 1) Lấy tất cả các bộ public (is_public = 0)
      */
+    // Phân trang công khai
+
     @GetMapping("/public")
-    public List<DocumentListResponse> getPublicLists() {
-        return service.getPublicLists();
+    public Page<DocumentListResponse> getPublicLists(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "8") int size
+    ) {
+        Pageable pageable = PageRequest.of(page, size);  // bạn có thể thêm Sort ở đây nếu cần
+        return service.getPublicLists(pageable);
     }
 
     /**
      * 2) Lấy danh sách các loại (distinct types)
      */
-    @GetMapping("/distinct-types")
-    public List<String> getDistinctTypes() {
-        return service.getDistinctTypes();
-    }
+//    @GetMapping("/distinct-types")
+//    public List<String> getDistinctTypes() {
+//        return service.getDistinctTypes();
+//    }
 
     /**
      * 3) Lấy grouped theo type, mỗi type tối đa 4 items

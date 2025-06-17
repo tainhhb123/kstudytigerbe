@@ -14,18 +14,16 @@ public interface DocumentListRepository extends JpaRepository<DocumentList, Long
     // Lấy theo user
     List<DocumentList> findByUser_UserId(Long userId);
 
-    // Lấy public lists (is_public = 0)
-    List<DocumentList> findByIsPublic(int isPublic);
+    // Phân trang các bản ghi public (isPublic = 0)
+    Page<DocumentList> findByIsPublic(int isPublic, Pageable pageable);
 
     // Lấy theo type + public flag
     List<DocumentList> findByTypeAndIsPublic(String type, int isPublic);
 
-    // Lấy các type distinct
+    // Lấy danh sách các type duy nhất
     @Query("SELECT DISTINCT d.type FROM DocumentList d")
     List<String> findDistinctTypes();
 
+    // Lấy toàn bộ public lists không phân trang
     List<DocumentList> findAllByIsPublic(int isPublic);
-
-
-
 }

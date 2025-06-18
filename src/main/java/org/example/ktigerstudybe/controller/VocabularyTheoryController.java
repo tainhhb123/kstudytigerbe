@@ -4,6 +4,7 @@ import org.example.ktigerstudybe.dto.req.VocabularyTheoryRequest;
 import org.example.ktigerstudybe.dto.resp.VocabularyTheoryResponse;
 import org.example.ktigerstudybe.service.vocabularyTheory.VocabularyTheoryService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -68,5 +69,30 @@ public class VocabularyTheoryController {
     @GetMapping("/level/{levelId}")
     public List<VocabularyTheoryResponse> getVocabsByLevel(@PathVariable Long levelId) {
         return vocabularyTheoryService.getVocabulariesByLevelId(levelId);
+    }
+
+
+    //admin
+    // NEW: GET paged vocab cho frontend
+    @GetMapping("/lessons/{lessonId}/vocab/paged")
+    public Page<VocabularyTheoryResponse> getVocabPaged(
+            @PathVariable Long lessonId,
+            @RequestParam int page,
+            @RequestParam int size
+    ) {
+        return vocabularyTheoryService.getPagedVocabByLesson(lessonId, page, size);
+    }
+
+    @PutMapping("/vocab/{id}")
+    public ResponseEntity<VocabularyTheoryResponse> updateVocabAlias(
+            @PathVariable Long id,
+            @RequestBody VocabularyTheoryRequest req
+    ) {
+        try {
+            VocabularyTheoryResponse updated = vocabularyTheoryService.updateVocabularyTheory(id, req);
+            return ResponseEntity.ok(updated);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 }

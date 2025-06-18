@@ -16,5 +16,6 @@ public interface VocabularyTheoryRepository extends JpaRepository<VocabularyTheo
     List<VocabularyTheory> findByLesson_LessonId(Long lessonId);
 
     //admin
-    Page<VocabularyTheory> findByLesson_LessonId(Long lessonId, Pageable pageable);
-}
+    Page<VocabularyTheory> findByLesson_LessonIdAndWordContainingIgnoreCaseOrMeaningContainingIgnoreCase(
+            Long lessonId, String wordKeyword, String meaningKeyword, Pageable pageable
+    );}

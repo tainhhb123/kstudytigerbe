@@ -16,6 +16,6 @@ public interface VocabularyTheoryService {
     List<VocabularyTheoryResponse> getVocabulariesByLevelId(Long levelId);
 
     //admin
-    Page<VocabularyTheoryResponse> getPagedVocabByLesson(Long lessonId, int page, int size);
+    Page<VocabularyTheoryResponse> getPagedVocabByLesson(Long lessonId, String searchTerm, int page, int size);
 
 }

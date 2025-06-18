@@ -77,22 +77,12 @@ public class VocabularyTheoryController {
     @GetMapping("/lessons/{lessonId}/vocab/paged")
     public Page<VocabularyTheoryResponse> getVocabPaged(
             @PathVariable Long lessonId,
+            @RequestParam(required = false) String searchTerm,
             @RequestParam int page,
             @RequestParam int size
     ) {
-        return vocabularyTheoryService.getPagedVocabByLesson(lessonId, page, size);
+        // ĐÃ SỬA: Truyền searchTerm xuống service
+        return vocabularyTheoryService.getPagedVocabByLesson(lessonId, searchTerm, page, size);
     }
 
-    @PutMapping("/vocab/{id}")
-    public ResponseEntity<VocabularyTheoryResponse> updateVocabAlias(
-            @PathVariable Long id,
-            @RequestBody VocabularyTheoryRequest req
-    ) {
-        try {
-            VocabularyTheoryResponse updated = vocabularyTheoryService.updateVocabularyTheory(id, req);
-            return ResponseEntity.ok(updated);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.notFound().build();
-        }
-    }
 }

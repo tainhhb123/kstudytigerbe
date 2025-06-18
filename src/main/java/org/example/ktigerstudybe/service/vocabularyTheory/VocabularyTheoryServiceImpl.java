@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.util.StringUtils;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -113,10 +114,13 @@ public class VocabularyTheoryServiceImpl implements VocabularyTheoryService {
 
     //admin
     @Override
-    public Page<VocabularyTheoryResponse> getPagedVocabByLesson(Long lessonId, int page, int size) {
+    public Page<VocabularyTheoryResponse> getPagedVocabByLesson(Long lessonId, String searchTerm, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
-        return vocabularyTheoryRepository.findByLesson_LessonId(lessonId, pageable)
-                .map(this::toResponse);
+        // Sử dụng phương thức repository có tìm kiếm
+        String actualSearchTerm = StringUtils.hasText(searchTerm) ? searchTerm : ""; // Pass empty string if no search term
+        return vocabularyTheoryRepository.findByLesson_LessonIdAndWordContainingIgnoreCaseOrMeaningContainingIgnoreCase(
+                lessonId, actualSearchTerm, actualSearchTerm, pageable
+        ).map(this::toResponse);
     }
 
 

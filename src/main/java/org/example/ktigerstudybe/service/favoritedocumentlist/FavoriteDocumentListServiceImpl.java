@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -88,4 +89,11 @@ public class FavoriteDocumentListServiceImpl implements FavoriteDocumentListServ
         return repo.findByDocumentList_ListId(listId).stream()
                 .map(this::toResponse).collect(Collectors.toList());
     }
+
+    @Override
+    public Optional<FavoriteDocumentListResponse> getByUserAndList(Long userId, Long listId) {
+        return repo.findByUser_UserIdAndDocumentList_ListId(userId, listId)
+                .map(this::toResponse);
+    }
+
 }

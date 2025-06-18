@@ -5,6 +5,11 @@ import org.example.ktigerstudybe.dto.req.DocumentListRequest;
 import org.example.ktigerstudybe.dto.resp.DocumentListResponse;
 import org.example.ktigerstudybe.service.documentList.DocumentListService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -25,8 +30,14 @@ public class DocumentListController {
      * 1) Lấy tất cả các bộ public (is_public = 0)
      */
     @GetMapping("/public")
-    public List<DocumentListResponse> getPublicLists() {
-        return service.getPublicLists();
+    public ResponseEntity<Page<DocumentListResponse>> getPublicLists(
+            @RequestParam(name = "page", defaultValue = "0") int page,
+            @RequestParam(name = "size", defaultValue = "8") int size
+    ) {
+        // Tạo Pageable với sort giảm dần theo createdAt (thay field khác nếu cần)
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
+        Page<DocumentListResponse> result = service.getPublicLists(pageable);
+        return ResponseEntity.ok(result);
     }
 
     /**

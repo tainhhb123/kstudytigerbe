@@ -50,4 +50,14 @@ public class FavoriteDocumentListController {
     public List<FavoriteDocumentListResponse> getByList(@PathVariable Long listId) {
         return service.getByList(listId);
     }
+
+    @GetMapping("/user/{userId}/list/{listId}")
+    public ResponseEntity<FavoriteDocumentListResponse> checkFavorite(
+            @PathVariable Long userId,
+            @PathVariable Long listId
+    ) {
+        return service.getByUserAndList(userId, listId)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
+    }
 }

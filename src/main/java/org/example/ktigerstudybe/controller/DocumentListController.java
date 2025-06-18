@@ -5,6 +5,9 @@ import org.example.ktigerstudybe.dto.req.DocumentListRequest;
 import org.example.ktigerstudybe.dto.resp.DocumentListResponse;
 import org.example.ktigerstudybe.service.documentList.DocumentListService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -98,4 +101,35 @@ public class DocumentListController {
     public void delete(@PathVariable Long id) {
         service.deleteDocumentList(id);
     }
+
+    //admin
+    // Paged: public with optional search
+    @GetMapping("/public/paged")
+    public Page<DocumentListResponse> getPublicPaged(
+            @RequestParam(required = false, defaultValue = "") String keyword,
+            @PageableDefault(size = 10) Pageable pageable
+    ) {
+        return service.searchPublic(keyword, pageable);
+    }
+
+    // Paged: lists by user
+    @GetMapping("/user/{userId}/paged")
+    public Page<DocumentListResponse> getByUserPaged(
+            @PathVariable Long userId,
+            @PageableDefault(size = 10) Pageable pageable
+    ) {
+        return service.listByUser(userId, pageable);
+    }
+
+    // Paged: lists by user + search
+    @GetMapping("/user/{userId}/search/paged")
+    public Page<DocumentListResponse> searchByUserPaged(
+            @PathVariable Long userId,
+            @RequestParam String keyword,
+            @PageableDefault(size = 10) Pageable pageable
+    ) {
+        return service.searchByUser(userId, keyword, pageable);
+    }
+
+
 }

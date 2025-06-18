@@ -103,6 +103,7 @@ public class DocumentItemServiceImpl implements DocumentItemService {
         documentItemRepository.deleteByDocumentList_ListId(listId);
     }
 
+    //admin
     @Override
     public Page<DocumentItemResponse> getDocumentItemsPaged(
             Long listId, String keyword, Pageable pageable) {

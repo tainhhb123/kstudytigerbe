@@ -1,5 +1,6 @@
 package org.example.ktigerstudybe.service.auth;
 
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.example.ktigerstudybe.dto.req.SignInRequest;
 import org.example.ktigerstudybe.dto.req.SignUpRequest;
@@ -7,6 +8,7 @@ import org.example.ktigerstudybe.dto.resp.AuthResponse;
 import org.example.ktigerstudybe.model.User;
 import org.example.ktigerstudybe.repository.UserRepository;
 import org.example.ktigerstudybe.service.auth.AuthService;
+import org.example.ktigerstudybe.service.userxp.UserXPService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -18,8 +20,11 @@ public class AuthServiceImpl implements AuthService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    //
+    private final UserXPService userXPService;
 
     @Override
+    @Transactional
     public AuthResponse signUp(SignUpRequest request) {
         if (userRepository.existsByEmail(request.getEmail())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email đã được sử dụng.");
@@ -32,6 +37,9 @@ public class AuthServiceImpl implements AuthService {
         user.setRole("USER"); // mặc định
 
         userRepository.save(user);
+
+        //tao them userXP
+        userXPService.createInitialUserXP(user.getUserId());
 
         AuthResponse resp = new AuthResponse();
         resp.setUserId(user.getUserId());

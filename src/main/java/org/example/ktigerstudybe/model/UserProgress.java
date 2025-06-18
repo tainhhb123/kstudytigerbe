@@ -15,7 +15,7 @@ public class UserProgress {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "progress_id") // tên đúng với DB
+    @Column(name = "progress_id")
     private Long progressId;
 
     @ManyToOne(fetch = FetchType.LAZY)

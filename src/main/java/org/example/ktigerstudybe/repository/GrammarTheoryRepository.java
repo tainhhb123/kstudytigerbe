@@ -2,6 +2,8 @@
 package org.example.ktigerstudybe.repository;
 
 import org.example.ktigerstudybe.model.GrammarTheory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -13,4 +15,9 @@ public interface GrammarTheoryRepository extends JpaRepository<GrammarTheory, Lo
     List<GrammarTheory> findByLevelId(@Param("levelId") Long levelId);
 
     List<GrammarTheory> findByLesson_LessonId(Long lessonId);
+
+    //admin
+    Page<GrammarTheory> findByLesson_LessonIdAndGrammarTitleContainingIgnoreCaseOrGrammarContentContainingIgnoreCase(
+            Long lessonId, String titleKeyword, String contentKeyword, Pageable pageable
+    );
 }

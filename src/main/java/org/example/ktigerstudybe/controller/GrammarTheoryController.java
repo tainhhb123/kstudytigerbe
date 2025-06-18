@@ -6,6 +6,9 @@ import org.example.ktigerstudybe.service.grammarTheory.GrammarTheoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.PageRequest;
 
 import java.util.List;
 
@@ -67,5 +70,17 @@ public class GrammarTheoryController {
     @GetMapping("/level/{levelId}")
     public List<GrammarTheoryResponse> getGrammarByLevel(@PathVariable Long levelId) {
         return grammarTheoryService.getGrammarByLevelId(levelId);
+    }
+
+
+    //admin
+    @GetMapping("/lessons/{lessonId}/grammar/paged")
+    public Page<GrammarTheoryResponse> getGrammarPaged(
+            @PathVariable Long lessonId,
+            @RequestParam(required = false) String searchTerm,
+            @RequestParam int page,
+            @RequestParam int size
+    ) {
+        return grammarTheoryService.getPagedGrammarByLesson(lessonId, searchTerm, page, size);
     }
 }

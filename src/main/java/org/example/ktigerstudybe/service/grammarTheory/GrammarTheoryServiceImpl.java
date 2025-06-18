@@ -7,7 +7,11 @@ import org.example.ktigerstudybe.model.Lesson;
 import org.example.ktigerstudybe.repository.GrammarTheoryRepository;
 import org.example.ktigerstudybe.repository.LessonRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -94,5 +98,16 @@ public class GrammarTheoryServiceImpl implements GrammarTheoryService {
     public List<GrammarTheoryResponse> getGrammarByLevelId(Long levelId) {
         return grammarTheoryRepository.findByLevelId(levelId)
                 .stream().map(this::toResponse).collect(Collectors.toList());
+    }
+
+    //admin
+    @Override
+    public Page<GrammarTheoryResponse> getPagedGrammarByLesson(Long lessonId, String searchTerm, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        String actualSearchTerm = StringUtils.hasText(searchTerm) ? searchTerm : "";
+        return grammarTheoryRepository
+                .findByLesson_LessonIdAndGrammarTitleContainingIgnoreCaseOrGrammarContentContainingIgnoreCase(
+                        lessonId, actualSearchTerm, actualSearchTerm, pageable
+                ).map(this::toResponse);
     }
 }

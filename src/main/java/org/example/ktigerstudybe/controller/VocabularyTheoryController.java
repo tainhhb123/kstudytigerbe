@@ -81,7 +81,6 @@ public class VocabularyTheoryController {
             @RequestParam int page,
             @RequestParam int size
     ) {
-        // ĐÃ SỬA: Truyền searchTerm xuống service
         return vocabularyTheoryService.getPagedVocabByLesson(lessonId, searchTerm, page, size);
     }
 

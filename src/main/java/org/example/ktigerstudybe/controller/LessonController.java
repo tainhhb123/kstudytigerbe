@@ -65,7 +65,7 @@ public class LessonController {
     @GetMapping("/paged")
     public ResponseEntity<Page<LessonResponse>> getLessonsPaged(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "15") int size,
+            @RequestParam(defaultValue = "5") int size,
             @RequestParam(required = false) Long levelId,
             @RequestParam(required = false) String keyword
     ) {

@@ -161,6 +161,8 @@ public class DocumentListServiceImpl implements DocumentListService {
         return map;
     }
 
+
+    //amdin
     @Override
     public Page<DocumentListResponse> listByUser(Long userId, Pageable pg) {
         return documentListRepository
@@ -179,4 +181,18 @@ public class DocumentListServiceImpl implements DocumentListService {
                 )
                 .map(mapper::toResponse);
     }
+
+    @Override
+    public Page<DocumentListResponse> searchByUser(Long userId, String keyword, Pageable pg) {
+        String kw = keyword == null ? "" : keyword.trim();
+        return documentListRepository
+                .findByIsPublicAndTitleContainingIgnoreCaseOrIsPublicAndUser_FullNameContainingIgnoreCase(
+                        1, kw,
+                        1, kw,
+                        pg
+                )
+                .map(mapper::toResponse);
+    }
+
+
 }

@@ -30,7 +30,10 @@ public interface DocumentItemService {
     // Xóa toàn bộ mục từ vựng theo ListID
     void deleteDocumentItemsByListId(Long listId);
 
+    //admin
     Page<DocumentItemResponse> getDocumentItemsPaged(
             Long listId, String keyword, Pageable pageable
     );
+
+
 }

@@ -76,6 +76,11 @@ public class DocumentListController {
         return service.getDocumentListsByUserId(userId);
     }
 
+    @GetMapping("/favorited/{id}")
+    public List<DocumentListResponse> getDocumentListFavoritedByUserId(@PathVariable Long id) {
+        return service.getDocumentListFavoritedByUserId(id);
+    }
+
     /**
      * 6) Lấy chi tiết theo id (chỉ khớp số)
      */

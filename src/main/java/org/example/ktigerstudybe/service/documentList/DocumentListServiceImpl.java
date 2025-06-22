@@ -9,6 +9,7 @@ import org.example.ktigerstudybe.model.DocumentList;
 import org.example.ktigerstudybe.model.User;
 import org.example.ktigerstudybe.repository.DocumentItemRepository;
 import org.example.ktigerstudybe.repository.DocumentListRepository;
+import org.example.ktigerstudybe.repository.FavoriteDocumentListRepository;
 import org.example.ktigerstudybe.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -29,6 +30,8 @@ public class DocumentListServiceImpl implements DocumentListService {
     private final UserRepository userRepository;
     private final DocumentItemRepository documentItemRepository;
     private final DocumentListMapper mapper;
+    @Autowired
+    private FavoriteDocumentListRepository repo;
 
     @Autowired
     public DocumentListServiceImpl(
@@ -122,16 +125,35 @@ public class DocumentListServiceImpl implements DocumentListService {
     }
 
     @Override
+    @Transactional
     public void deleteDocumentList(Long id) {
         if (!documentListRepository.existsById(id)) {
             throw new NoSuchElementException("Cannot delete, not found: " + id);
         }
+
+        // 1) Xóa các favorite trỏ tới list này
+        repo.deleteByDocumentList_ListId(id);
+
+        // 2) Xóa các document items trỏ tới list này
+        documentItemRepository.deleteByDocumentList_ListId(id);
+
+        // 3) Cuối cùng xóa document list
         documentListRepository.deleteById(id);
     }
 
     @Override
+    public List<DocumentListResponse> getDocumentListFavoritedByUserId(Long id){
+        return documentListRepository.findFavoritedByUserId(id).stream()
+                .map(mapper::toResponse)
+                .collect(Collectors.toList());
+    }
+
+
+
+    @Override
     public List<DocumentListResponse> getDocumentListsByUserId(Long userId) {
-        return documentListRepository.findByUser_UserId(userId)
+        return documentListRepository
+                .findByUser_UserIdOrderByCreatedAtDesc(userId)   // ← method đã tồn tại
                 .stream()
                 .map(mapper::toResponse)
                 .collect(Collectors.toList());

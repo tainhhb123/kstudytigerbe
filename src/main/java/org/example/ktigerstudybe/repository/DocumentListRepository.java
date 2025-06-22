@@ -42,6 +42,7 @@ public interface DocumentListRepository extends JpaRepository<DocumentList, Long
             int isPublic2, String nameKeyword,
             Pageable pageable
     );
+    List<DocumentList> findByUser_UserIdOrderByCreatedAtDesc(Long userId);
 
     // Tìm theo title hoặc type (LIKE, ignore case), có phân trang
     @Query("""
@@ -54,6 +55,16 @@ public interface DocumentListRepository extends JpaRepository<DocumentList, Long
        )
   """)
     Page<DocumentList> searchPublicByTitleOrType(@Param("kw") String keyword, Pageable pageable);
+
+    /**
+     * Trả về tất cả DocumentList mà user này đã đánh dấu favorite
+     */
+    @Query("""
+      SELECT f.documentList 
+        FROM FavoriteDocumentList f 
+       WHERE f.user.userId = :userId
+    """)
+    List<DocumentList> findFavoritedByUserId(@Param("userId") Long userId);
 
 
 }

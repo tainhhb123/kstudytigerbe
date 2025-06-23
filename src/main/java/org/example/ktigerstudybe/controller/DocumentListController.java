@@ -10,6 +10,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -157,5 +158,15 @@ public class DocumentListController {
     ) {
         Page<DocumentListResponse> result = service.searchPublicByTitleOrType(keyword, pageable);
         return ResponseEntity.ok(result);
+    }
+
+    /**
+     * 11) Đảo ngược trạng thái công khai của DocumentList:
+     *     nếu isPublic = 0 → thành 1, ngược lại 1 → thành 0
+     */
+    @PatchMapping("/{id:\\d+}/visibility")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void toggleVisibility(@PathVariable Long id) {
+        service.toggleVisibility(id);
     }
 }

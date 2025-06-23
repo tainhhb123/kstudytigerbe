@@ -111,6 +111,19 @@ public class DocumentListServiceImpl implements DocumentListService {
 
     @Override
     @Transactional
+    public void toggleVisibility(Long id) {
+        DocumentList list = documentListRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("DocumentList not found: " + id));
+
+        // flip 0 ↔ 1
+        list.setIsPublic(list.getIsPublic() == 0 ? 1 : 0);
+
+        // save the change
+        documentListRepository.save(list);
+    }
+
+    @Override
+    @Transactional
     public DocumentListResponse updateDocumentList(Long id, DocumentListRequest req) {
         DocumentList e = documentListRepository.findById(id)
                 .orElseThrow(() ->

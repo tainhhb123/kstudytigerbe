@@ -58,6 +58,8 @@ public interface DocumentListService {
      */
     List<DocumentListResponse> getByTypeAndPublic(String type, int isPublic);
 
+    void toggleVisibility(Long id);
+
     /**
      * Nhóm các bộ flashcard theo type, mỗi nhóm tối đa 'limit' phần tử
      */

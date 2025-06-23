@@ -1,11 +1,13 @@
 // src/main/java/org/example/ktigerstudybe/repository/DocumentListRepository.java
 package org.example.ktigerstudybe.repository;
 
+import jakarta.transaction.Transactional;
 import org.example.ktigerstudybe.model.DocumentList;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Range;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -67,4 +69,13 @@ public interface DocumentListRepository extends JpaRepository<DocumentList, Long
     List<DocumentList> findFavoritedByUserId(@Param("userId") Long userId);
 
 
+
+    @Modifying
+    @Transactional
+    @Query("""
+      UPDATE DocumentList d
+         SET d.isPublic = CASE WHEN d.isPublic = 0 THEN 1 ELSE 0 END
+       WHERE d.listId    = :listId
+    """)
+    int toggleIsPublic(@Param("listId") Long listId);
 }

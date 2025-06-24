@@ -29,5 +29,8 @@ public class VocabularyTheory {
     @Column(name = "Example")
     private String example;
 
+    @Column(name = "Image")
+    private String image;
+
 }
 

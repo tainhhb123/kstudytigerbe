@@ -26,6 +26,8 @@ public interface DocumentListService {
      */
     DocumentListResponse getDocumentListById(Long id);
 
+
+
     List<DocumentListResponse> getDocumentListFavoritedByUserId(Long id);
 
     /**

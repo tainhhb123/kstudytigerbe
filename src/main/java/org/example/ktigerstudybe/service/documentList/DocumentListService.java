@@ -26,6 +26,8 @@ public interface DocumentListService {
      */
     DocumentListResponse getDocumentListById(Long id);
 
+    List<DocumentListResponse> getDocumentListFavoritedByUserId(Long id);
+
     /**
      * Cập nhật bộ flashcard theo ID
      */
@@ -55,6 +57,8 @@ public interface DocumentListService {
      * Lấy các bộ flashcard theo type, và có thể filter isPublic (0 hoặc 1)
      */
     List<DocumentListResponse> getByTypeAndPublic(String type, int isPublic);
+
+    void toggleVisibility(Long id);
 
     /**
      * Nhóm các bộ flashcard theo type, mỗi nhóm tối đa 'limit' phần tử

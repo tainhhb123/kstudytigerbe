@@ -9,4 +9,5 @@ public class VocabularyTheoryRequest {
     private String word;
     private String meaning;
     private String example;
+    private String image;
 }

@@ -1,12 +1,15 @@
 // src/main/java/org/example/ktigerstudybe/repository/DocumentListRepository.java
 package org.example.ktigerstudybe.repository;
 
+import jakarta.transaction.Transactional;
 import org.example.ktigerstudybe.model.DocumentList;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Range;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
@@ -41,6 +44,38 @@ public interface DocumentListRepository extends JpaRepository<DocumentList, Long
             int isPublic2, String nameKeyword,
             Pageable pageable
     );
+    List<DocumentList> findByUser_UserIdOrderByCreatedAtDesc(Long userId);
+
+    // Tìm theo title hoặc type (LIKE, ignore case), có phân trang
+    @Query("""
+    SELECT d
+      FROM DocumentList d
+     WHERE d.isPublic = 0
+       AND (
+         LOWER(d.title) LIKE LOWER(CONCAT('%', :kw, '%'))
+      OR LOWER(d.type ) LIKE LOWER(CONCAT('%', :kw, '%'))
+       )
+  """)
+    Page<DocumentList> searchPublicByTitleOrType(@Param("kw") String keyword, Pageable pageable);
+
+    /**
+     * Trả về tất cả DocumentList mà user này đã đánh dấu favorite
+     */
+    @Query("""
+      SELECT f.documentList 
+        FROM FavoriteDocumentList f 
+       WHERE f.user.userId = :userId
+    """)
+    List<DocumentList> findFavoritedByUserId(@Param("userId") Long userId);
 
 
+
+    @Modifying
+    @Transactional
+    @Query("""
+      UPDATE DocumentList d
+         SET d.isPublic = CASE WHEN d.isPublic = 0 THEN 1 ELSE 0 END
+       WHERE d.listId    = :listId
+    """)
+    int toggleIsPublic(@Param("listId") Long listId);
 }

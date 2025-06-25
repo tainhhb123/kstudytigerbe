@@ -7,7 +7,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Range;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
@@ -42,18 +41,6 @@ public interface DocumentListRepository extends JpaRepository<DocumentList, Long
             int isPublic2, String nameKeyword,
             Pageable pageable
     );
-
-    // Tìm theo title hoặc type (LIKE, ignore case), có phân trang
-    @Query("""
-    SELECT d
-      FROM DocumentList d
-     WHERE d.isPublic = 0
-       AND (
-         LOWER(d.title) LIKE LOWER(CONCAT('%', :kw, '%'))
-      OR LOWER(d.type ) LIKE LOWER(CONCAT('%', :kw, '%'))
-       )
-  """)
-    Page<DocumentList> searchPublicByTitleOrType(@Param("kw") String keyword, Pageable pageable);
 
 
 }

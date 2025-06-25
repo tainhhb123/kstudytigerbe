@@ -4,6 +4,7 @@ import org.example.ktigerstudybe.dto.req.MultipleChoiceQuestionRequest;
 import org.example.ktigerstudybe.dto.resp.MultipleChoiceQuestionResponse;
 import org.example.ktigerstudybe.service.multiplechoicequestion.MultipleChoiceQuestionService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -53,5 +54,17 @@ public class MultipleChoiceQuestionController {
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         service.delete(id);
         return ResponseEntity.noContent().build();
+    }
+
+    //admin
+    // Phân trang và tìm kiếm theo lessonId
+    @GetMapping("/lesson/{lessonId}/paged")
+    public Page<MultipleChoiceQuestionResponse> getByLessonIdPaged(
+            @PathVariable Long lessonId,
+            @RequestParam(defaultValue = "") String keyword,
+            @RequestParam int page,
+            @RequestParam int size
+    ) {
+        return service.getByLessonIdPaged(lessonId, keyword, page, size);
     }
 }

@@ -8,6 +8,10 @@ import org.example.ktigerstudybe.repository.ExerciseRepository;
 import org.example.ktigerstudybe.repository.MultipleChoiceQuestionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.util.StringUtils;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -97,5 +101,15 @@ public class MultipleChoiceQuestionServiceImpl implements MultipleChoiceQuestion
     @Override
     public List<MultipleChoiceQuestionResponse> getByExerciseId(Long exerciseId) {
         return questionRepository.findByExercise_ExerciseId(exerciseId).stream().map(this::toResponse).collect(Collectors.toList());
+    }
+
+    //admin
+    @Override
+    public Page<MultipleChoiceQuestionResponse> getByLessonIdPaged(Long lessonId, String keyword, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        String search = (keyword != null && !keyword.isEmpty()) ? keyword : "";
+        return questionRepository
+                .findByExercise_Lesson_LessonIdAndQuestionTextContainingIgnoreCase(lessonId, search, pageable)
+                .map(this::toResponse);
     }
 }

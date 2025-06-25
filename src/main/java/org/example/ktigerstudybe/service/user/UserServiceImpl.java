@@ -110,4 +110,13 @@ public class UserServiceImpl implements UserService {
             .map(this::toResponse);
   }
 
+  @Override
+  public UserResponse getUserByEmail(String email) {
+    User user = userRepository.findByEmail(email)
+            .orElseThrow(() ->
+                    new NoSuchElementException("Không tìm thấy user với email: " + email)
+            );
+    return toResponse(user);
+  }
+
 }

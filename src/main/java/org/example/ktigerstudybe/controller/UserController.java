@@ -9,6 +9,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.NoSuchElementException;
+
 //@CrossOrigin(origins = "http://localhost:5173")
 @RestController
 @RequestMapping("/api/users")
@@ -89,5 +91,15 @@ public class UserController {
           @RequestParam(defaultValue = "0") int page,
           @RequestParam(defaultValue = "5") int size) {
     return userService.searchUsers(keyword, PageRequest.of(page, size));
+  }
+
+  @GetMapping("/email/{email}")
+  public ResponseEntity<UserResponse> getByEmail(@PathVariable String email) {
+    try {
+      UserResponse resp = userService.getUserByEmail(email);
+      return ResponseEntity.ok(resp);
+    } catch (NoSuchElementException e) {
+      return ResponseEntity.notFound().build();
+    }
   }
 }

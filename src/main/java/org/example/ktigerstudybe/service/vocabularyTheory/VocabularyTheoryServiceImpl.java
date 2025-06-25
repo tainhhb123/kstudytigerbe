@@ -36,6 +36,7 @@ public class VocabularyTheoryServiceImpl implements VocabularyTheoryService {
         resp.setWord(vocab.getWord());
         resp.setMeaning(vocab.getMeaning());
         resp.setExample(vocab.getExample());
+        resp.setImage(vocab.getImage());
 
         //them
         resp.setLevelId(vocab.getLesson().getLevel().getLevelId());
@@ -53,6 +54,7 @@ public class VocabularyTheoryServiceImpl implements VocabularyTheoryService {
         vocab.setWord(req.getWord());
         vocab.setMeaning(req.getMeaning());
         vocab.setExample(req.getExample());
+        vocab.setImage(req.getImage());
         return vocab;
     }
 
@@ -89,6 +91,7 @@ public class VocabularyTheoryServiceImpl implements VocabularyTheoryService {
         vocab.setMeaning(request.getMeaning());
         vocab.setExample(request.getExample());
         vocab = vocabularyTheoryRepository.save(vocab);
+        vocab.setImage(request.getImage());
         return toResponse(vocab);
     }
 

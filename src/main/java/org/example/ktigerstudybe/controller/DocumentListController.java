@@ -10,7 +10,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -75,11 +74,6 @@ public class DocumentListController {
     @GetMapping("/user/{userId}")
     public List<DocumentListResponse> getByUser(@PathVariable Long userId) {
         return service.getDocumentListsByUserId(userId);
-    }
-
-    @GetMapping("/favorited/{id}")
-    public List<DocumentListResponse> getDocumentListFavoritedByUserId(@PathVariable Long id) {
-        return service.getDocumentListFavoritedByUserId(id);
     }
 
     /**

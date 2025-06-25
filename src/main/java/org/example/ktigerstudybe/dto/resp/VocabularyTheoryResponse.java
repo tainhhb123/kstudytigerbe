@@ -12,4 +12,5 @@ public class VocabularyTheoryResponse {
     private String example;
     private Long levelId;
     private String levelName;
+    private String image;
 }

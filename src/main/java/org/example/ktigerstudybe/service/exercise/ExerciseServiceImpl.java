@@ -8,6 +8,9 @@ import org.example.ktigerstudybe.repository.ExerciseRepository;
 import org.example.ktigerstudybe.repository.LessonRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -86,5 +89,15 @@ public class ExerciseServiceImpl implements ExerciseService {
     public List<ExerciseResponse> getExercisesByLessonId(Long lessonId) {
         return exerciseRepository.findByLesson_LessonId(lessonId).stream()
                 .map(this::toResponse).collect(Collectors.toList());
+    }
+
+    //ad
+    @Override
+    public Page<ExerciseResponse> getExercisesByLessonIdPaged(Long lessonId, String title, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Exercise> pageResult = exerciseRepository.findByLesson_LessonIdAndExerciseTitleContainingIgnoreCase(
+                lessonId, title == null ? "" : title, pageable
+        );
+        return pageResult.map(this::toResponse);
     }
 }

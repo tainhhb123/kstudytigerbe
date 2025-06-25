@@ -4,6 +4,7 @@ import org.example.ktigerstudybe.dto.req.ExerciseRequest;
 import org.example.ktigerstudybe.dto.resp.ExerciseResponse;
 import org.example.ktigerstudybe.service.exercise.ExerciseService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -57,5 +58,16 @@ public class ExerciseController {
     public ResponseEntity<Void> deleteExercise(@PathVariable Long id) {
         exerciseService.deleteExercise(id);
         return ResponseEntity.noContent().build();
+    }
+
+    //ad
+    @GetMapping("/lesson/{lessonId}/paged")
+    public Page<ExerciseResponse> getExercisesByLessonPaged(
+            @PathVariable Long lessonId,
+            @RequestParam(defaultValue = "") String title,
+            @RequestParam int page,
+            @RequestParam int size
+    ) {
+        return exerciseService.getExercisesByLessonIdPaged(lessonId, title, page, size);
     }
 }

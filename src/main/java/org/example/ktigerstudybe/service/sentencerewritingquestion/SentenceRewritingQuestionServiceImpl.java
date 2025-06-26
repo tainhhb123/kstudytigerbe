@@ -7,6 +7,9 @@ import org.example.ktigerstudybe.model.SentenceRewritingQuestion;
 import org.example.ktigerstudybe.repository.ExerciseRepository;
 import org.example.ktigerstudybe.repository.SentenceRewritingQuestionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -81,5 +84,14 @@ public class SentenceRewritingQuestionServiceImpl implements SentenceRewritingQu
     public List<SentenceRewritingQuestionResponse> getByExerciseId(Long exerciseId) {
         return repo.findByExercise_ExerciseId(exerciseId)
                 .stream().map(this::toResponse).collect(Collectors.toList());
+    }
+
+    //ad
+    @Override
+    public Page<SentenceRewritingQuestionResponse> getByLessonIdPaged(Long lessonId, String keyword, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        String search = (keyword != null && !keyword.isEmpty()) ? keyword : "";
+        return repo.findByExercise_Lesson_LessonIdAndOriginalSentenceContainingIgnoreCase(lessonId, search, pageable)
+                .map(this::toResponse);
     }
 }

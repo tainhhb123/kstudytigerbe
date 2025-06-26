@@ -26,6 +26,8 @@ public interface DocumentListService {
      */
     DocumentListResponse getDocumentListById(Long id);
 
+
+
     List<DocumentListResponse> getDocumentListFavoritedByUserId(Long id);
 
     /**
@@ -60,6 +62,8 @@ public interface DocumentListService {
 
     void toggleVisibility(Long id);
 
+
+
     /**
      * Nhóm các bộ flashcard theo type, mỗi nhóm tối đa 'limit' phần tử
      */
@@ -70,4 +74,5 @@ public interface DocumentListService {
     Page<DocumentListResponse> listByUser(Long userId, Pageable pg);
     Page<DocumentListResponse> searchPublic(String keyword, Pageable pageable);
     Page<DocumentListResponse> searchByUser(Long userId, String keyword, Pageable pg);
+    Page<DocumentListResponse> searchPublicByTitleOrType(String keyword, Pageable pageable);
 }

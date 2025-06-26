@@ -32,4 +32,6 @@ public interface UserService {
 	// Tìm kiếm user theo keyword (phân trang)
 	Page<UserResponse> searchUsers(String keyword, Pageable pageable);
 
+	UserResponse getUserByEmail(String email);
+
 }

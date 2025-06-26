@@ -164,4 +164,13 @@ public class DocumentListController {
     public void toggleVisibility(@PathVariable Long id) {
         service.toggleVisibility(id);
     }
+
+
+    /**
+     * 12) Lấy tất cả DocumentList mà user này đã đánh dấu favorite
+     */
+    @GetMapping("/favorited/{userId}")
+    public List<DocumentListResponse> getFavoritedByUser(@PathVariable("userId") Long userId) {
+        return service.getDocumentListFavoritedByUserId(userId);
+    }
 }

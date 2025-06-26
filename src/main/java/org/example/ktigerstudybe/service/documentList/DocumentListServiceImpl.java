@@ -110,6 +110,17 @@ public class DocumentListServiceImpl implements DocumentListService {
     }
 
     @Override
+    public Page<DocumentListResponse> searchPublicByTitleOrType(String keyword, Pageable pageable) {
+        String kw = (keyword == null ? "" : keyword.trim());
+        return documentListRepository
+                // nếu dùng @Query:
+                .searchPublicByTitleOrType(kw, pageable)
+                // nếu dùng method tự sinh:
+                // .findByIsPublicAndTitleContainingIgnoreCaseOrIsPublicAndTypeContainingIgnoreCase(0, kw, 0, kw, pageable)
+                .map(mapper::toResponse);
+    }
+
+    @Override
     @Transactional
     public void toggleVisibility(Long id) {
         DocumentList list = documentListRepository.findById(id)

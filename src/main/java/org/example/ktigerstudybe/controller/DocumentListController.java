@@ -145,15 +145,15 @@ public class DocumentListController {
      * 10) Tìm kiếm theo title hoặc type, chỉ cần 1 ô input
      *    Ví dụ: GET /api/document-lists/search?keyword=java&page=0&size=10
      */
-    @GetMapping("/search")
-    public ResponseEntity<Page<DocumentListResponse>> searchPublicByTitleOrType(
-            @RequestParam("keyword") String keyword,
-            @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC)
-            Pageable pageable
-    ) {
-        Page<DocumentListResponse> result = service.searchPublicByTitleOrType(keyword, pageable);
-        return ResponseEntity.ok(result);
-    }
+//    @GetMapping("/search")
+//    public ResponseEntity<Page<DocumentListResponse>> searchPublicByTitleOrType(
+//            @RequestParam("keyword") String keyword,
+//            @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC)
+//            Pageable pageable
+//    ) {
+//        Page<DocumentListResponse> result = service.searchPublicByTitleOrType(keyword, pageable);
+//        return ResponseEntity.ok(result);
+//    }
 
     /**
      * 11) Đảo ngược trạng thái công khai của DocumentList:

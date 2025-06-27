@@ -1,7 +1,10 @@
 package org.example.ktigerstudybe.controller;
 
+import org.example.ktigerstudybe.dto.req.ChangePasswordRequest;
+import org.example.ktigerstudybe.dto.req.ForgotPasswordRequest;
 import org.example.ktigerstudybe.dto.req.UserRequest;
 import org.example.ktigerstudybe.dto.resp.UserResponse;
+import org.example.ktigerstudybe.model.User;
 import org.example.ktigerstudybe.service.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -102,4 +105,15 @@ public class UserController {
       return ResponseEntity.notFound().build();
     }
   }
+  @PostMapping("/change-password")
+  public ResponseEntity<?> changePassword(@RequestBody ChangePasswordRequest request) {
+    try {
+      userService.changePassword(request);
+      return ResponseEntity.ok("Đổi mật khẩu thành công");
+    } catch (RuntimeException e) {
+      return ResponseEntity.badRequest().body(e.getMessage());
+    }
+  }
+
+
 }

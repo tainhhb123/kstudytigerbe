@@ -1,5 +1,7 @@
 package org.example.ktigerstudybe.service.user;
 
+import org.example.ktigerstudybe.dto.req.ChangePasswordRequest;
+import org.example.ktigerstudybe.dto.req.ForgotPasswordRequest;
 import org.example.ktigerstudybe.dto.req.UserRequest;
 import org.example.ktigerstudybe.dto.resp.UserResponse;
 import org.springframework.data.domain.Page;
@@ -33,5 +35,7 @@ public interface UserService {
 	Page<UserResponse> searchUsers(String keyword, Pageable pageable);
 
 	UserResponse getUserByEmail(String email);
+
+	void changePassword(ChangePasswordRequest request);
 
 }

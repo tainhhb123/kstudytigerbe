@@ -1,5 +1,8 @@
 package org.example.ktigerstudybe.service.auth;
 
+import org.example.ktigerstudybe.model.PasswordResetToken;
+import org.example.ktigerstudybe.repository.PasswordResetTokenRepository;
+import org.example.ktigerstudybe.service.email.EmailService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -15,6 +18,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.http.HttpStatus;
 
+import java.time.LocalDateTime;
+import java.util.Optional;
+import java.util.UUID;
+
 @Service
 @RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {
@@ -23,6 +30,10 @@ public class AuthServiceImpl implements AuthService {
     private final PasswordEncoder passwordEncoder;
 
     private final UserXPService userXPService;
+
+    private final PasswordResetTokenRepository tokenRepository;
+    private final EmailService emailService;
+
 
     @Override
     @Transactional
@@ -69,5 +80,44 @@ public class AuthServiceImpl implements AuthService {
         resp.setRole(user.getRole());
 
         return resp;
+    }
+    @Override
+    public void forgotPassword(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Không tìm thấy email này!"));
+
+        // Xóa token cũ nếu có
+        tokenRepository.deleteByUser(user);
+
+        // Tạo token mới
+        String token = UUID.randomUUID().toString();
+        LocalDateTime expiry = LocalDateTime.now().plusMinutes(15);
+
+        PasswordResetToken prt = new PasswordResetToken();
+        prt.setToken(token);
+        prt.setUser(user);
+        prt.setExpiryDate(expiry);
+        tokenRepository.save(prt);
+
+        // Gửi email (nên chuyển emailService ra field @Autowired hoặc final)
+        String resetLink = "http://localhost:8080/api/auth/reset-password?token=" + token;
+        String content = "Click vào link này để đặt lại mật khẩu (có hiệu lực 15 phút): " + resetLink;
+        emailService.sendSimpleEmail(email, "Yêu cầu đặt lại mật khẩu", content);
+    }
+
+    @Override
+    public void resetPassword(String token, String newPassword) {
+        PasswordResetToken prt = tokenRepository.findByToken(token)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Token không hợp lệ!"));
+
+        if (prt.getExpiryDate().isBefore(LocalDateTime.now())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Token đã hết hạn!");
+        }
+
+        User user = prt.getUser();
+        user.setPassword(passwordEncoder.encode(newPassword)); // mã hóa lại mật khẩu
+        userRepository.save(user);
+
+        tokenRepository.delete(prt);
     }
 }

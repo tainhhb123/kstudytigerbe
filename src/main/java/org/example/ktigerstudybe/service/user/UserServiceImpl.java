@@ -1,22 +1,33 @@
 package org.example.ktigerstudybe.service.user;
 
+import org.example.ktigerstudybe.dto.req.ChangePasswordRequest;
+import org.example.ktigerstudybe.dto.req.ForgotPasswordRequest;
 import org.example.ktigerstudybe.dto.req.UserRequest;
 import org.example.ktigerstudybe.dto.resp.UserResponse;
+import org.example.ktigerstudybe.model.PasswordResetToken;
 import org.example.ktigerstudybe.model.User;
+import org.example.ktigerstudybe.repository.PasswordResetTokenRepository;
 import org.example.ktigerstudybe.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.NoSuchElementException;
+import java.util.UUID;
 
 @Service
 public class UserServiceImpl implements UserService {
 
   @Autowired
   private UserRepository userRepository;
+  @Autowired
+  private PasswordEncoder passwordEncoder;
 
+  @Autowired
+  private PasswordResetTokenRepository passwordResetTokenRepository;
   // Convert entity -> response DTO
   private UserResponse toResponse(User user) {
     UserResponse resp = new UserResponse();
@@ -42,6 +53,11 @@ public class UserServiceImpl implements UserService {
     user.setRole(req.getRole());
     user.setUserStatus(req.getUserStatus());
     user.setUserName(req.getUserName());
+
+    user.setGender(req.getGender());
+    user.setDateOfBirth(req.getDateOfBirth());
+    user.setAvatarImage(req.getAvatarImage());
+    user.setJoinDate(req.getJoinDate());
     return user;
   }
 
@@ -75,6 +91,12 @@ public class UserServiceImpl implements UserService {
     user.setRole(request.getRole());
     user.setUserStatus(request.getUserStatus());
     user.setUserName(request.getUserName());
+
+    user.setGender(request.getGender());
+    user.setDateOfBirth(request.getDateOfBirth());
+    user.setAvatarImage(request.getAvatarImage());
+    user.setJoinDate(request.getJoinDate());
+
     user = userRepository.save(user);
     return toResponse(user);
   }
@@ -118,5 +140,21 @@ public class UserServiceImpl implements UserService {
             );
     return toResponse(user);
   }
+
+  @Override
+  public void changePassword(ChangePasswordRequest request) {
+    User user = userRepository.findByEmail(request.getEmail())
+            .orElseThrow(() -> new RuntimeException("Không tìm thấy người dùng"));
+
+    // So sánh mật khẩu cũ (đã mã hóa trong DB)
+    if (!passwordEncoder.matches(request.getCurrentPassword(), user.getPassword())) {
+      throw new RuntimeException("Mật khẩu hiện tại không đúng");
+    }
+
+    // Mã hóa mật khẩu mới và lưu lại
+    user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+    userRepository.save(user);
+  }
+
 
 }

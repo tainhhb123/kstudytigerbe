@@ -90,8 +90,9 @@ public class VocabularyTheoryServiceImpl implements VocabularyTheoryService {
         vocab.setWord(request.getWord());
         vocab.setMeaning(request.getMeaning());
         vocab.setExample(request.getExample());
-        vocab = vocabularyTheoryRepository.save(vocab);
         vocab.setImage(request.getImage());
+
+        vocab = vocabularyTheoryRepository.save(vocab);
         return toResponse(vocab);
     }
 

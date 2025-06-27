@@ -17,7 +17,13 @@ public interface GrammarTheoryRepository extends JpaRepository<GrammarTheory, Lo
     List<GrammarTheory> findByLesson_LessonId(Long lessonId);
 
     //admin
-    Page<GrammarTheory> findByLesson_LessonIdAndGrammarTitleContainingIgnoreCaseOrGrammarContentContainingIgnoreCase(
-            Long lessonId, String titleKeyword, String contentKeyword, Pageable pageable
+    // Sửa tên method để lessonId xuất hiện cả ở vế OR
+    // Thay hàm cũ bằng hàm mới với lessonId xuất hiện 2 lần
+    Page<GrammarTheory> findByLesson_LessonIdAndGrammarTitleContainingIgnoreCaseOrLesson_LessonIdAndGrammarContentContainingIgnoreCase(
+            Long lessonId,
+            String titleKeyword,
+            Long lessonIdAgain,
+            String contentKeyword,
+            Pageable pageable
     );
 }

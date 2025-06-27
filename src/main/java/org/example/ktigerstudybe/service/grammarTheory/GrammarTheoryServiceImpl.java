@@ -101,13 +101,15 @@ public class GrammarTheoryServiceImpl implements GrammarTheoryService {
     }
 
     //admin
+    // Đảm bảo truyền lessonId 2 lần
     @Override
     public Page<GrammarTheoryResponse> getPagedGrammarByLesson(Long lessonId, String searchTerm, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
-        String actualSearchTerm = StringUtils.hasText(searchTerm) ? searchTerm : "";
+        String actualSearchTerm = StringUtils.hasText(searchTerm) ? searchTerm.trim() : "";
         return grammarTheoryRepository
-                .findByLesson_LessonIdAndGrammarTitleContainingIgnoreCaseOrGrammarContentContainingIgnoreCase(
-                        lessonId, actualSearchTerm, actualSearchTerm, pageable
-                ).map(this::toResponse);
+                .findByLesson_LessonIdAndGrammarTitleContainingIgnoreCaseOrLesson_LessonIdAndGrammarContentContainingIgnoreCase(
+                        lessonId, actualSearchTerm, lessonId, actualSearchTerm, pageable
+                )
+                .map(this::toResponse);
     }
 }

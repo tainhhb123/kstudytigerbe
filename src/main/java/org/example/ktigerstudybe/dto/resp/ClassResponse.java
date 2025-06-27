@@ -13,4 +13,5 @@ public class ClassResponse {
     private String userFullName;
     private LocalDateTime createdAt;
     private String password;
+
 }

@@ -172,6 +172,15 @@ public class DocumentListServiceImpl implements DocumentListService {
                 .collect(Collectors.toList());
     }
 
+    @Override
+    public List<DocumentListResponse> getUnassignedByUserId(Long userId) {
+        return documentListRepository
+                .findUnassignedByUserId(userId)
+                .stream()
+                .map(mapper::toResponse)
+                .collect(Collectors.toList());
+    }
+
 
 
     @Override

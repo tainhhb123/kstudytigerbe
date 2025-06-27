@@ -8,7 +8,6 @@ import org.example.ktigerstudybe.model.User;
 import org.example.ktigerstudybe.repository.ClassRepository;
 import org.example.ktigerstudybe.repository.ClassUserRepository;
 import org.example.ktigerstudybe.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -17,14 +16,19 @@ import java.util.stream.Collectors;
 @Service
 public class ClassUserServiceImpl implements ClassUserService {
 
-    @Autowired
-    private ClassUserRepository classUserRepository;
+    private final ClassUserRepository classUserRepository;
+    private final ClassRepository classRepository;
+    private final UserRepository userRepository;
 
-    @Autowired
-    private ClassRepository classRepository;
-
-    @Autowired
-    private UserRepository userRepository;
+    public ClassUserServiceImpl(
+            ClassUserRepository classUserRepository,
+            ClassRepository classRepository,
+            UserRepository userRepository
+    ) {
+        this.classUserRepository = classUserRepository;
+        this.classRepository = classRepository;
+        this.userRepository = userRepository;
+    }
 
     private ClassUserResponse toResponse(ClassUser cu) {
         ClassUserResponse res = new ClassUserResponse();
@@ -33,13 +37,17 @@ public class ClassUserServiceImpl implements ClassUserService {
         res.setClassName(cu.getClassEntity().getClassName());
         res.setUserId(cu.getUser().getUserId());
         res.setUserFullName(cu.getUser().getFullName());
+        // Map thêm email và avatar
+        res.setEmail(cu.getUser().getEmail());
+        res.setAvatarImage(cu.getUser().getAvatarImage());
         res.setJoinedAt(cu.getJoinedAt());
         return res;
     }
 
     @Override
     public List<ClassUserResponse> getAll() {
-        return classUserRepository.findAll().stream()
+        return classUserRepository.findAll()
+                .stream()
                 .map(this::toResponse)
                 .collect(Collectors.toList());
     }
@@ -54,16 +62,13 @@ public class ClassUserServiceImpl implements ClassUserService {
     @Override
     public ClassUserResponse create(ClassUserRequest request) {
         User user = userRepository.findById(request.getUserId())
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
-
+                .orElseThrow(() -> new IllegalArgumentException("User not found: " + request.getUserId()));
         ClassEntity classEntity = classRepository.findById(request.getClassId())
-                .orElseThrow(() -> new IllegalArgumentException("Class not found"));
-
+                .orElseThrow(() -> new IllegalArgumentException("Class not found: " + request.getClassId()));
         ClassUser cu = ClassUser.builder()
                 .user(user)
                 .classEntity(classEntity)
                 .build();
-
         return toResponse(classUserRepository.save(cu));
     }
 
@@ -77,14 +82,22 @@ public class ClassUserServiceImpl implements ClassUserService {
 
     @Override
     public List<ClassUserResponse> getByUser(Long userId) {
-        return classUserRepository.findByUser_UserId(userId).stream()
+        return classUserRepository.findByUser_UserId(userId)
+                .stream()
                 .map(this::toResponse)
                 .collect(Collectors.toList());
     }
 
+    // --- hàm mới: xoá theo userId ---
+    @Override
+    public void deleteByUser(Long userId) {
+        classUserRepository.deleteAllByUser_UserId(userId);
+    }
+
     @Override
     public List<ClassUserResponse> getByClass(Long classId) {
-        return classUserRepository.findByClassEntity_ClassId(classId).stream()
+        return classUserRepository.findByClassEntity_ClassId(classId)
+                .stream()
                 .map(this::toResponse)
                 .collect(Collectors.toList());
     }

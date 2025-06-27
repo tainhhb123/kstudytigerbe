@@ -173,4 +173,12 @@ public class DocumentListController {
     public List<DocumentListResponse> getFavoritedByUser(@PathVariable("userId") Long userId) {
         return service.getDocumentListFavoritedByUserId(userId);
     }
+
+    /**
+     * 13) Lấy các bộ flashcard của user mà chưa gán vào bất cứ lớp nào
+     */
+    @GetMapping("/user/{userId}/unassigned")
+    public List<DocumentListResponse> getUnassignedByUser(@PathVariable Long userId) {
+        return service.getUnassignedByUserId(userId);
+    }
 }

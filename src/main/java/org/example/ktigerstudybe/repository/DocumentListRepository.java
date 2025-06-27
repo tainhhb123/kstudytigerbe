@@ -78,4 +78,18 @@ public interface DocumentListRepository extends JpaRepository<DocumentList, Long
        WHERE d.listId    = :listId
     """)
     int toggleIsPublic(@Param("listId") Long listId);
+
+    /**
+     * Lấy tất cả DocumentList của user này mà chưa được gán vào bất cứ lớp nào.
+     */
+    @Query("""
+      SELECT d
+        FROM DocumentList d
+       WHERE d.user.userId = :userId
+         AND d.listId NOT IN (
+             SELECT cd.documentList.listId
+               FROM ClassDocumentList cd
+         )
+    """)
+    List<DocumentList> findUnassignedByUserId(@Param("userId") Long userId);
 }

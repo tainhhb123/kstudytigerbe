@@ -62,6 +62,10 @@ public interface DocumentListService {
 
     void toggleVisibility(Long id);
 
+    /**
+     * Lấy các bộ flashcard của một user mà chưa gán vào lớp nào.
+     */
+    List<DocumentListResponse> getUnassignedByUserId(Long userId);
 
 
     /**

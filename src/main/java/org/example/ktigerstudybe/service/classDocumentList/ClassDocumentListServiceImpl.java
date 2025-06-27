@@ -1,3 +1,4 @@
+// src/main/java/org/example/ktigerstudybe/service/classDocumentList/ClassDocumentListServiceImpl.java
 package org.example.ktigerstudybe.service.classDocumentList;
 
 import org.example.ktigerstudybe.dto.req.ClassDocumentListRequest;
@@ -31,15 +32,24 @@ public class ClassDocumentListServiceImpl implements ClassDocumentListService {
         res.setClassDocumentListId(cd.getClassDocumentListId());
         res.setClassId(cd.getClassEntity().getClassId());
         res.setClassName(cd.getClassEntity().getClassName());
-        res.setListId(cd.getDocumentList().getListId());
-        res.setListTitle(cd.getDocumentList().getTitle());
+        DocumentList dl = cd.getDocumentList();
+        res.setListId(dl.getListId());
+        res.setListTitle(dl.getTitle());
         res.setAssignedAt(cd.getAssignedAt());
+
+        // new fields:
+        res.setFullName(dl.getUser().getFullName());
+        res.setAvatarImage(dl.getUser().getAvatarImage());
+        res.setDescription(dl.getDescription());
+        res.setType(dl.getType());
         return res;
     }
 
     @Override
     public List<ClassDocumentListResponse> getAll() {
-        return repo.findAll().stream().map(this::toResponse).collect(Collectors.toList());
+        return repo.findAll().stream()
+                .map(this::toResponse)
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -53,7 +63,6 @@ public class ClassDocumentListServiceImpl implements ClassDocumentListService {
     public ClassDocumentListResponse create(ClassDocumentListRequest request) {
         ClassEntity classEntity = classRepo.findById(request.getClassId())
                 .orElseThrow(() -> new IllegalArgumentException("Class not found"));
-
         DocumentList documentList = listRepo.findById(request.getListId())
                 .orElseThrow(() -> new IllegalArgumentException("DocumentList not found"));
 
@@ -76,12 +85,14 @@ public class ClassDocumentListServiceImpl implements ClassDocumentListService {
     @Override
     public List<ClassDocumentListResponse> getByClassId(Long classId) {
         return repo.findByClassEntity_ClassId(classId).stream()
-                .map(this::toResponse).collect(Collectors.toList());
+                .map(this::toResponse)
+                .collect(Collectors.toList());
     }
 
     @Override
     public List<ClassDocumentListResponse> getByListId(Long listId) {
         return repo.findByDocumentList_ListId(listId).stream()
-                .map(this::toResponse).collect(Collectors.toList());
+                .map(this::toResponse)
+                .collect(Collectors.toList());
     }
 }

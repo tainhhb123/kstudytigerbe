@@ -12,4 +12,6 @@ public class ClassUserResponse {
     private Long userId;
     private String userFullName;
     private LocalDateTime joinedAt;
+    private String email;
+    private String avatarImage;
 }

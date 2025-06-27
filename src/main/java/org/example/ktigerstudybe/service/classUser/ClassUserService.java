@@ -10,6 +10,9 @@ public interface ClassUserService {
     ClassUserResponse getById(Long id);
     ClassUserResponse create(ClassUserRequest request);
     void delete(Long id);
-    List<ClassUserResponse> getByUser(Long userId);
+
+    void deleteByUser(Long userId);
+
     List<ClassUserResponse> getByClass(Long classId);
+    List<ClassUserResponse> getByUser(Long userId);
 }

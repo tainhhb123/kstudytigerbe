@@ -12,4 +12,9 @@ public class ClassDocumentListResponse {
     private Long listId;
     private String listTitle;
     private LocalDateTime assignedAt;
+    private String fullName;
+    private String avatarImage;
+    private String description;
+    private String type;
+
 }

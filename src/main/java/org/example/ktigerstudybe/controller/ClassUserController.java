@@ -50,4 +50,12 @@ public class ClassUserController {
     public List<ClassUserResponse> getByClass(@PathVariable Long classId) {
         return classUserService.getByClass(classId);
     }
+
+    // --- endpoint mới ---
+    @DeleteMapping("/user/{userId}")
+    public ResponseEntity<Void> deleteByUser(@PathVariable Long userId) {
+        classUserService.deleteByUser(userId);
+        return ResponseEntity.noContent().build();
+    }
+
 }

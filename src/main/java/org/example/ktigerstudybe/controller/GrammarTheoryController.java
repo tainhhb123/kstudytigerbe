@@ -74,6 +74,7 @@ public class GrammarTheoryController {
 
 
     //admin
+    // Sử dụng service với method mới
     @GetMapping("/lessons/{lessonId}/grammar/paged")
     public Page<GrammarTheoryResponse> getGrammarPaged(
             @PathVariable Long lessonId,

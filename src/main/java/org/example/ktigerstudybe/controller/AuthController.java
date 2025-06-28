@@ -8,6 +8,7 @@ import org.example.ktigerstudybe.dto.req.SignUpRequest;
 import org.example.ktigerstudybe.dto.resp.AuthResponse;
 import org.example.ktigerstudybe.service.auth.AuthService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -26,7 +27,9 @@ public class AuthController {
     public ResponseEntity<AuthResponse> signIn(@RequestBody SignInRequest request) {
         return ResponseEntity.ok(authService.signIn(request));
     }
+
     @PostMapping("/forgot-password")
+    @Transactional
     public ResponseEntity<?> forgotPassword(@RequestBody ForgotPasswordRequest request) {
         authService.forgotPassword(request.getEmail());
         return ResponseEntity.ok("Đã gửi email đặt lại mật khẩu. Vui lòng kiểm tra hộp thư.");

@@ -9,6 +9,10 @@ public class ChatMessageResponse {
     private String messageType;
     private LocalDateTime timestamp;
 
+    private String translation;
+
+
+
     // Constructors
     public ChatMessageResponse() {}
 
@@ -36,4 +40,13 @@ public class ChatMessageResponse {
 
     public LocalDateTime getTimestamp() { return timestamp; }
     public void setTimestamp(LocalDateTime timestamp) { this.timestamp = timestamp; }
+
+    public String getTranslation() {
+        return translation;
+    }
+
+    public void setTranslation(String translation) {
+        this.translation = translation;
+    }
+
 }

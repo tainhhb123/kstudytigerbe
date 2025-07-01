@@ -192,9 +192,9 @@ public class GeminiAIService {
                         "4. Hỏi lại hoặc gợi ý để tiếp tục cuộc trò chuyện. " +
                         "5. Dùng emoji phù hợp (😊, 😄, 🤔, 👍) nhưng không quá nhiều. " +
                         "6. Phản ứng cụ thể với nội dung tin nhắn của người dùng. " +
-                        "7. Đưa ra thông tin chi tiết, hữu ích trong ngữ cảnh. ";
-
-        String examplePrompt = switch (scenario) {
+                        "7. Đưa ra thông tin chi tiết, hữu ích trong ngữ cảnh. "+
+                        "8. LUÔN sử dụng dấu câu rõ ràng cho từng câu: dấu chấm (.), dấu hỏi (?), dấu cảm thán (!) ở cuối câu phù hợp. Không được bỏ dấu câu.";
+                        String examplePrompt = switch (scenario) {
             case "restaurant" ->
                     "\nVÍ DỤ CÁCH TRẢ LỜI:\n" +
                             "User: 메뉴 추천해 주세요\n" +
@@ -253,38 +253,55 @@ public class GeminiAIService {
         }
     }
 
+    // [CHANGED] Thêm hàm dịch sang tiếng Việt
+    public String translateToVietnamese(String koreanText) {
+        try {
+            // Prompt yêu cầu dịch sang tiếng Việt tự nhiên
+            String prompt = "Hãy dịch câu sau sang tiếng Việt tự nhiên, không thêm giải thích:\n" + koreanText;
+
+            Map<String, Object> requestBody = Map.of(
+                    "contents", List.of(
+                            Map.of("parts", List.of(
+                                    Map.of("text", prompt)
+                            ))
+                    ),
+                    "generationConfig", Map.of(
+                            "temperature", 0.2,
+                            "maxOutputTokens", 150
+                    )
+            );
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+
+            HttpEntity<Map<String, Object>> entity = new HttpEntity<>(requestBody, headers);
+            String url = geminiApiUrl + "?key=" + geminiApiKey;
+
+            ResponseEntity<Map> response = restTemplate.postForEntity(url, entity, Map.class);
+            String result = extractResponseText(response.getBody());
+            logger.info("Gemini Translate result: {}", result);
+            return result;
+        } catch (Exception e) {
+            logger.error("Gemini Translate Error: {}", e.getMessage(), e);
+            return "(Không dịch được)";
+        }
+    }
+
+
+
+
+
+    // giữ dấu câu và không xóa quá nhiều
     private String cleanResponse(String response) {
         if (response == null) return "네, 알겠어요!";
-
-        // Remove explanations, translations, etc. - chỉ giữ tiếng Hàn
-        String cleaned = response.replaceAll("\\([^)]*\\)", "") // Remove parentheses
-                .replaceAll("\\[[^]]*\\]", "") // Remove brackets
-                .replaceAll("[a-zA-Z]+", "")   // Remove English
-                .replaceAll("\\d+\\.", "")    // Remove numbering
-                .replaceAll("^AI:", "")       // Remove AI: prefix
-                .replaceAll("^User:", "")     // Remove User: prefix
+        // Chỉ loại bỏ phần giải thích không cần thiết, giữ lại dấu chấm, dấu hỏi, dấu cảm
+        String cleaned = response
+                .replaceAll("\\([^)]*\\)", "")  // xóa (phần giải thích)
+                .replaceAll("\\[[^]]*\\]", "")  // xóa [phần giải thích]
+                .replaceAll("^AI:", "")         // xóa tiền tố AI:
+                .replaceAll("^User:", "")       // xóa tiền tố User:
                 .trim();
-
-        // Split by Korean punctuation and take meaningful sentences
-        String[] sentences = cleaned.split("[.!?。！？]");
-        StringBuilder result = new StringBuilder();
-
-        for (String sentence : sentences) {
-            sentence = sentence.trim();
-            if (!sentence.isEmpty() && containsKorean(sentence)) {
-                if (result.length() > 0) {
-                    result.append(" ");
-                }
-                result.append(sentence);
-                // Limit to 2-3 sentences for better conversation flow
-                if (result.toString().split("\\s+").length > 15) {
-                    break;
-                }
-            }
-        }
-
-        String finalResult = result.toString().trim();
-        return finalResult.isEmpty() ? "네!" : finalResult;
+        return cleaned.isEmpty() ? "네!" : cleaned.trim();
     }
 
     private boolean containsKorean(String text) {

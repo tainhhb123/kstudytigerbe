@@ -53,25 +53,30 @@ public class ChatServiceImpl implements ChatService {
         ChatConversation conversation = conversationRepository.findById(conversationId)
                 .orElseThrow(() -> new IllegalArgumentException("대화를 찾을 수 없습니다: " + conversationId));
 
-        // 사용자 메시지 저장
+        // 1) Lưu userMessage
         ChatMessage userMessage = new ChatMessage(conversation, request.getContent(), "user");
         userMessage = messageRepository.save(userMessage);
 
-        // AI 응답 생성
+        // 2) Gọi AI sinh phản hồi tiếng Hàn
         String aiResponse = geminiAIService.generateKoreanResponse(
                 request.getContent(),
                 conversation.getScenario(),
                 conversation.getDifficulty()
         );
 
-        // AI 메시지 저장
+        // 3) Dịch sang tiếng Việt
+        String viTranslation = geminiAIService.translateToVietnamese(aiResponse);
+
+        // 4) Lưu AI message (tiếng Hàn)
         ChatMessage aiMessage = new ChatMessage(conversation, aiResponse, "ai");
         aiMessage = messageRepository.save(aiMessage);
 
-        return new ChatResponsePair(
-                toMessageResponse(userMessage),
-                toMessageResponse(aiMessage)
-        );
+        // 5) Tạo ChatResponsePair trả về
+        ChatMessageResponse userResp = toMessageResponse(userMessage);
+        ChatMessageResponse aiResp = toMessageResponse(aiMessage);
+        aiResp.setTranslation(viTranslation); // Gắn bản dịch tiếng Việt
+
+        return new ChatResponsePair(userResp, aiResp);
     }
 
     @Override
@@ -136,12 +141,15 @@ public class ChatServiceImpl implements ChatService {
     }
 
     private ChatMessageResponse toMessageResponse(ChatMessage message) {
-        return new ChatMessageResponse(
+        ChatMessageResponse resp = new ChatMessageResponse(
                 message.getMessageId(),
                 message.getConversation().getConversationId(),
                 message.getContent(),
                 message.getMessageType(),
                 message.getTimestamp()
         );
+        // Khởi tạo translation để tránh null
+        resp.setTranslation(null);
+        return resp;
     }
 }

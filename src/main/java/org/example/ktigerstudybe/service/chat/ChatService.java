@@ -13,5 +13,5 @@ public interface ChatService {
     ChatResponsePair sendMessage(Long conversationId, SendChatMessageRequest request);
     List<ChatMessageResponse> getConversationMessages(Long conversationId);
     List<ChatConversationResponse> getUserConversations(Long userId);
-    void deleteConversation(Long conversationId);
+    void deleteConversation(Long conversationId) ;
 }

@@ -1,22 +1,29 @@
 package org.example.ktigerstudybe.service.lesson;
 
 import org.example.ktigerstudybe.dto.req.LessonRequest;
+import org.example.ktigerstudybe.dto.req.UserXPUpdateRequest;
 import org.example.ktigerstudybe.dto.resp.LessonResponse;
 import org.example.ktigerstudybe.dto.resp.LessonWithProgressResponse;
+import org.example.ktigerstudybe.dto.resp.UserXPResponse;
 import org.example.ktigerstudybe.model.Lesson;
 import org.example.ktigerstudybe.model.UserProgress;
 import org.example.ktigerstudybe.repository.LessonRepository;
 import org.example.ktigerstudybe.repository.UserProgressRepository;
+import org.example.ktigerstudybe.repository.UserRepository;
+import org.example.ktigerstudybe.service.userxp.UserXPService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -26,6 +33,11 @@ public class LessonServiceImpl implements LessonService {
     private LessonRepository lessonRepository;
     @Autowired
     private UserProgressRepository userProgressRepository;
+
+    @Autowired
+    private UserRepository userRepository;
+    @Autowired
+    private UserXPService userXPService;
 
     // Mapping từ Entity sang Response DTO
     private LessonResponse toResponse(Lesson lesson) {
@@ -139,5 +151,46 @@ public class LessonServiceImpl implements LessonService {
             pageData = lessonRepository.findAll(pageable);
         }
         return pageData.map(this::toResponse);
+    }
+
+    @Override
+    @Transactional
+    public Map<String, Object> completeLesson(Long userId, Long lessonId, Integer score) {
+        // ✅ Kiểm tra UserProgress để xem đã hoàn thành chưa
+        Optional<UserProgress> existingProgressOpt = userProgressRepository
+                .findByUser_UserIdAndLesson_LessonId(userId, lessonId);
+
+        UserProgress existingProgress = existingProgressOpt.orElse(null);
+
+        // ✅ Kiểm tra lần đầu hoàn thành dựa trên IsLessonCompleted
+        boolean isFirstTimeCompletion = (existingProgress == null ||
+                !existingProgress.getIsLessonCompleted());
+
+        // ✅ Cập nhật/tạo mới UserProgress (chỉ lưu trạng thái hoàn thành)
+        UserProgress progress = existingProgress != null ? existingProgress : new UserProgress();
+        progress.setUser(userRepository.findById(userId).orElseThrow());
+        progress.setLesson(lessonRepository.findById(lessonId).orElseThrow());
+        progress.setIsLessonCompleted(true);
+        progress.setLastAccessed(LocalDateTime.now());
+
+        userProgressRepository.save(progress);
+
+        // ✅ Chỉ cộng XP nếu là lần đầu hoàn thành
+        UserXPResponse xpData = null;
+        if (isFirstTimeCompletion) {
+            // Tạo request object
+            UserXPUpdateRequest xpRequest = new UserXPUpdateRequest();
+            xpRequest.setUserId(userId);
+            xpRequest.setXpToAdd(score);
+
+            xpData = userXPService.addXP(xpRequest);
+        }
+
+        return Map.of(
+                "completed", true,
+                "isFirstTime", isFirstTimeCompletion,
+                "xpAdded", isFirstTimeCompletion,
+                "xpData", xpData != null ? xpData : Map.of()
+        );
     }
 }

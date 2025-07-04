@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/lessons")
@@ -66,6 +67,14 @@ public class LessonController {
             @RequestParam Long userId
     ) {
         return lessonService.getLessonsWithProgress(levelId, userId);
+    }
+    @PostMapping("/complete")
+    public Map<String, Object> completeLesson(
+            @RequestParam Long userId,
+            @RequestParam Long lessonId,
+            @RequestParam Integer score
+    ) {
+        return lessonService.completeLesson(userId, lessonId, score);
     }
 
     //admin

@@ -76,6 +76,13 @@ public class ClassServiceImpl implements ClassService {
 
         return toResponse(classRepository.save(entity));
     }
+    @Override
+    public ClassResponse getClassByIdAndPassword(Long classId, String password) {
+        ClassEntity entity = classRepository.findByClassIdAndPassword(classId, password)
+                .orElseThrow(() -> new IllegalArgumentException("Class not found or wrong password"));
+        return toResponse(entity);
+    }
+
 
     @Override
     public void deleteClass(Long classId) {

@@ -12,4 +12,6 @@ public interface ClassService {
     ClassResponse updateClass(Long classId, ClassRequest request);
     void deleteClass(Long classId);
     List<ClassResponse> getClassesByUserId(Long userId);
+    ClassResponse getClassByIdAndPassword(Long classId, String password);
+
 }

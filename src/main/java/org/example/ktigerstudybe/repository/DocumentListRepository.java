@@ -33,17 +33,15 @@ public interface DocumentListRepository extends JpaRepository<DocumentList, Long
 
 
     //admin
-    Page<DocumentList> findByIsPublicAndTitleContainingIgnoreCase(
-            int isPublic, String keyword, Pageable pageable);
+    // Lấy tất cả tài liệu của user
+    Page<DocumentList> findByUser_UserId(Long userId, Pageable pageable);
 
-    Page<DocumentList> findByUser_UserIdAndIsPublic(
-            Long userId, int isPublic, Pageable pageable);
+    // Tìm kiếm theo title hoặc tên tác giả
+    Page<DocumentList> findByTitleContainingIgnoreCaseOrUser_FullNameContainingIgnoreCase(
+            String titleKeyword, String nameKeyword, Pageable pageable);
 
-    Page<DocumentList> findByIsPublicAndTitleContainingIgnoreCaseOrIsPublicAndUser_FullNameContainingIgnoreCase(
-            int isPublic, String titleKeyword,
-            int isPublic2, String nameKeyword,
-            Pageable pageable
-    );
+
+
     List<DocumentList> findByUser_UserIdOrderByCreatedAtDesc(Long userId);
 
     // Tìm theo title hoặc type (LIKE, ignore case), có phân trang

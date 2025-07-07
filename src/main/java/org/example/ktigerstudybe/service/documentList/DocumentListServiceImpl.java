@@ -220,34 +220,29 @@ public class DocumentListServiceImpl implements DocumentListService {
     //amdin
     @Override
     public Page<DocumentListResponse> listByUser(Long userId, Pageable pg) {
+        // Lấy tất cả tài liệu của user
         return documentListRepository
-                .findByUser_UserIdAndIsPublic(userId, 1, pg)
+                .findByUser_UserId(userId, pg)
                 .map(mapper::toResponse);
     }
 
     @Override
     public Page<DocumentListResponse> searchPublic(String keyword, Pageable pageable) {
         String kw = (keyword == null ? "" : keyword.trim());
-        return documentListRepository
-                .findByIsPublicAndTitleContainingIgnoreCaseOrIsPublicAndUser_FullNameContainingIgnoreCase(
-                        1, kw,
-                        1, kw,
-                        pageable
-                )
-                .map(mapper::toResponse);
-    }
 
-    @Override
-    public Page<DocumentListResponse> searchByUser(Long userId, String keyword, Pageable pg) {
-        String kw = keyword == null ? "" : keyword.trim();
-        return documentListRepository
-                .findByIsPublicAndTitleContainingIgnoreCaseOrIsPublicAndUser_FullNameContainingIgnoreCase(
-                        1, kw,
-                        1, kw,
-                        pg
-                )
-                .map(mapper::toResponse);
+        if (kw.isEmpty()) {
+            // Không có keyword => lấy tất cả tài liệu
+            return documentListRepository
+                    .findAll(pageable)
+                    .map(mapper::toResponse);
+        } else {
+            // Có keyword => tìm theo title hoặc tên tác giả
+            return documentListRepository
+                    .findByTitleContainingIgnoreCaseOrUser_FullNameContainingIgnoreCase(
+                            kw, kw, pageable
+                    )
+                    .map(mapper::toResponse);
+        }
     }
-
 
 }

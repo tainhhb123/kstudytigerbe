@@ -113,7 +113,7 @@ public class DocumentListController {
     }
 
     //admin
-    // Paged: public with optional search
+    // Tìm kiếm tất cả tài liệu theo title hoặc tên tác giả
     @GetMapping("/public/paged")
     public Page<DocumentListResponse> getPublicPaged(
             @RequestParam(required = false, defaultValue = "") String keyword,
@@ -122,23 +122,13 @@ public class DocumentListController {
         return service.searchPublic(keyword, pageable);
     }
 
-    // Paged: lists by user
+    // Lấy tất cả tài liệu của user
     @GetMapping("/user/{userId}/paged")
     public Page<DocumentListResponse> getByUserPaged(
             @PathVariable Long userId,
             @PageableDefault(size = 10) Pageable pageable
     ) {
         return service.listByUser(userId, pageable);
-    }
-
-    // Paged: lists by user + search
-    @GetMapping("/user/{userId}/search/paged")
-    public Page<DocumentListResponse> searchByUserPaged(
-            @PathVariable Long userId,
-            @RequestParam String keyword,
-            @PageableDefault(size = 10) Pageable pageable
-    ) {
-        return service.searchByUser(userId, keyword, pageable);
     }
 
     /**

@@ -77,6 +77,5 @@ public interface DocumentListService {
     //admin
     Page<DocumentListResponse> listByUser(Long userId, Pageable pg);
     Page<DocumentListResponse> searchPublic(String keyword, Pageable pageable);
-    Page<DocumentListResponse> searchByUser(Long userId, String keyword, Pageable pg);
     Page<DocumentListResponse> searchPublicByTitleOrType(String keyword, Pageable pageable);
 }

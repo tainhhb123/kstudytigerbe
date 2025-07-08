@@ -8,4 +8,5 @@ import java.util.List;
 
 public interface UserProgressService {
     void completeLesson(Long userId, Long lessonId);
+
 }

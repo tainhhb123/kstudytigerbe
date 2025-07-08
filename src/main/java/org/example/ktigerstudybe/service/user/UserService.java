@@ -11,7 +11,8 @@ import java.util.List;
 
 public interface UserService {
 	// Lấy tất cả user (có phân trang)
-	Page<UserResponse> getAllUsers(Pageable pageable);
+	Page<UserResponse> getAllLearners(Pageable pageable);
+	Page<UserResponse> searchLearners(String keyword, Pageable pageable);
 
 	// Lấy user theo ID
 	UserResponse getUserById(Long id);
@@ -32,8 +33,6 @@ public interface UserService {
 	UserResponse unfreezeUser(Long id);
 
 	// Tìm kiếm user theo keyword (phân trang)
-	Page<UserResponse> searchUsers(String keyword, Pageable pageable);
-
 	UserResponse getUserByEmail(String email);
 
 	void changePassword(ChangePasswordRequest request);

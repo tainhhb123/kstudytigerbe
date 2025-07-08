@@ -2,14 +2,19 @@ package org.example.ktigerstudybe.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.example.ktigerstudybe.dto.req.ForgotPasswordRequest;
+import org.example.ktigerstudybe.dto.req.GoogleSignInRequest;
 import org.example.ktigerstudybe.dto.req.ResetPasswordRequest;
 import org.example.ktigerstudybe.dto.req.SignInRequest;
 import org.example.ktigerstudybe.dto.req.SignUpRequest;
 import org.example.ktigerstudybe.dto.resp.AuthResponse;
+import org.example.ktigerstudybe.dto.resp.GoogleSignInResponse;
 import org.example.ktigerstudybe.service.auth.AuthService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -28,6 +33,28 @@ public class AuthController {
         return ResponseEntity.ok(authService.signIn(request));
     }
 
+    // ✅ NEW: Google Sign In endpoint
+    @PostMapping("/google-signin")
+    public ResponseEntity<GoogleSignInResponse> googleSignIn(@RequestBody GoogleSignInRequest request) {
+        try {
+            System.out.println("=== GOOGLE SIGN IN START ===");
+            GoogleSignInResponse response = authService.googleSignIn(request);
+            System.out.println("Google signin successful: " + response);
+            return ResponseEntity.ok(response);
+
+        } catch (Exception e) {
+            System.err.println("Google signin error: " + e.getMessage());
+            e.printStackTrace();
+
+            GoogleSignInResponse errorResponse = new GoogleSignInResponse(
+                    null, null, null, null, false,
+                    "Đăng nhập Google thất bại: " + e.getMessage()
+            );
+
+            return ResponseEntity.status(400).body(errorResponse);
+        }
+    }
+
     @PostMapping("/forgot-password")
     @Transactional
     public ResponseEntity<?> forgotPassword(@RequestBody ForgotPasswordRequest request) {
@@ -39,5 +66,14 @@ public class AuthController {
     public ResponseEntity<?> resetPassword(@RequestBody ResetPasswordRequest request) {
         authService.resetPassword(request.getToken(), request.getNewPassword());
         return ResponseEntity.ok("Đặt lại mật khẩu thành công!");
+    }
+
+    // ✅ Test endpoint
+    @GetMapping("/test-google")
+    public ResponseEntity<Map<String, Object>> testGoogle() {
+        Map<String, Object> response = new HashMap<>();
+        response.put("message", "Google OAuth endpoint is ready");
+        response.put("timestamp", System.currentTimeMillis());
+        return ResponseEntity.ok(response);
     }
 }

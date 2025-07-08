@@ -10,8 +10,10 @@ import java.util.Optional;
 
 public interface UserRepository extends JpaRepository<User, Long> {
     // Search users by name, email or username
-    Page<User> findByFullNameContainingIgnoreCaseOrEmailContainingIgnoreCaseOrUserNameContainingIgnoreCase(
-            String fullName, String email, String userName, Pageable pageable);
+    Page<User> findByRole(String role, Pageable pageable);
+
+    Page<User> findByRoleAndFullNameContainingIgnoreCaseOrEmailContainingIgnoreCase(
+            String role, String fullName, String email, Pageable pageable);
 
     Optional<User> findByEmail(String email);
     Boolean existsByEmail(String email);

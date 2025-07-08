@@ -1,5 +1,6 @@
 package org.example.ktigerstudybe.service.userprogress;
 
+import org.example.ktigerstudybe.dto.resp.UserProgressResponse;
 import org.example.ktigerstudybe.model.Lesson;
 import org.example.ktigerstudybe.model.User;
 import org.example.ktigerstudybe.model.UserProgress;
@@ -7,11 +8,15 @@ import org.example.ktigerstudybe.repository.LessonRepository;
 import org.example.ktigerstudybe.repository.UserProgressRepository;
 import org.example.ktigerstudybe.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class UserProgressServiceImpl implements UserProgressService {
@@ -32,7 +37,6 @@ public class UserProgressServiceImpl implements UserProgressService {
         Lesson lesson = lessonRepository.findById(lessonId)
                 .orElseThrow(() -> new RuntimeException("Lesson not found"));
 
-        // Cập nhật hoặc tạo tiến trình cho bài học hiện tại
         UserProgress progress = userProgressRepository
                 .findByUser_UserIdAndLesson_LessonId(userId, lessonId)
                 .orElseGet(() -> {
@@ -46,7 +50,6 @@ public class UserProgressServiceImpl implements UserProgressService {
         progress.setLastAccessed(LocalDateTime.now());
         userProgressRepository.save(progress);
 
-        // Mở khóa bài học tiếp theo (nếu có)
         List<Lesson> lessons = lessonRepository.findByLevel_LevelId(lesson.getLevel().getLevelId());
         lessons.sort(Comparator.comparing(Lesson::getLessonId));
 
@@ -64,4 +67,5 @@ public class UserProgressServiceImpl implements UserProgressService {
             }
         }
     }
+
 }

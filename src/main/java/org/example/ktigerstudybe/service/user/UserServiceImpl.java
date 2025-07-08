@@ -1,10 +1,8 @@
 package org.example.ktigerstudybe.service.user;
 
 import org.example.ktigerstudybe.dto.req.ChangePasswordRequest;
-import org.example.ktigerstudybe.dto.req.ForgotPasswordRequest;
 import org.example.ktigerstudybe.dto.req.UserRequest;
 import org.example.ktigerstudybe.dto.resp.UserResponse;
-import org.example.ktigerstudybe.model.PasswordResetToken;
 import org.example.ktigerstudybe.model.User;
 import org.example.ktigerstudybe.repository.PasswordResetTokenRepository;
 import org.example.ktigerstudybe.repository.UserRepository;
@@ -14,9 +12,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.NoSuchElementException;
-import java.util.UUID;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -28,6 +24,7 @@ public class UserServiceImpl implements UserService {
 
   @Autowired
   private PasswordResetTokenRepository passwordResetTokenRepository;
+
   // Convert entity -> response DTO
   private UserResponse toResponse(User user) {
     UserResponse resp = new UserResponse();
@@ -62,12 +59,6 @@ public class UserServiceImpl implements UserService {
   }
 
   @Override
-  public Page<UserResponse> getAllUsers(Pageable pageable) {
-    return userRepository.findAll(pageable)
-            .map(this::toResponse);
-  }
-
-  @Override
   public UserResponse getUserById(Long id) {
     User user = userRepository.findById(id)
             .orElseThrow(() -> new NoSuchElementException("User not found with id: " + id));
@@ -87,7 +78,6 @@ public class UserServiceImpl implements UserService {
             .orElseThrow(() -> new NoSuchElementException("User not found with id: " + id));
     user.setFullName(request.getFullName());
     user.setEmail(request.getEmail());
-    // Không update password ở đây (nếu muốn update password nên có hàm riêng)
     user.setRole(request.getRole());
     user.setUserStatus(request.getUserStatus());
     user.setUserName(request.getUserName());
@@ -106,30 +96,61 @@ public class UserServiceImpl implements UserService {
     userRepository.deleteById(id);
   }
 
+  // ✅ FIXED: Đóng băng user - Correct logic
   @Override
   public UserResponse freezeUser(Long id) {
+    System.out.println("=== FREEZE USER SERVICE START ===");
+    System.out.println("Freezing user ID: " + id);
+
     User user = userRepository.findById(id)
             .orElseThrow(() -> new NoSuchElementException("User not found with id: " + id));
-    user.setUserStatus(1); // 1 = frozen
+
+    System.out.println("User before freeze: " + user.getFullName() + ", current status: " + user.getUserStatus());
+
+    // ✅ FIXED: 0 = frozen/inactive
+    user.setUserStatus(0);
+
     user = userRepository.save(user);
+
+    System.out.println("User after freeze: " + user.getFullName() + ", new status: " + user.getUserStatus());
+    System.out.println("✅ User frozen successfully");
+
     return toResponse(user);
   }
 
+  // ✅ FIXED: Mở băng user - Correct logic
   @Override
   public UserResponse unfreezeUser(Long id) {
+    System.out.println("=== UNFREEZE USER SERVICE START ===");
+    System.out.println("Unfreezing user ID: " + id);
+
     User user = userRepository.findById(id)
             .orElseThrow(() -> new NoSuchElementException("User not found with id: " + id));
-    user.setUserStatus(0); // 0 = active
+
+    System.out.println("User before unfreeze: " + user.getFullName() + ", current status: " + user.getUserStatus());
+
+    // ✅ FIXED: 1 = active/unfrozen
+    user.setUserStatus(1);
+
     user = userRepository.save(user);
+
+    System.out.println("User after unfreeze: " + user.getFullName() + ", new status: " + user.getUserStatus());
+    System.out.println("✅ User unfrozen successfully");
+
     return toResponse(user);
   }
 
   @Override
-  public Page<UserResponse> searchUsers(String keyword, Pageable pageable) {
-    return userRepository
-            .findByFullNameContainingIgnoreCaseOrEmailContainingIgnoreCaseOrUserNameContainingIgnoreCase(
-                    keyword, keyword, keyword, pageable)
-            .map(this::toResponse);
+  public Page<UserResponse> getAllLearners(Pageable pageable) {
+    Page<User> users = userRepository.findByRole("user", pageable);
+    return users.map(this::toResponse);
+  }
+
+  @Override
+  public Page<UserResponse> searchLearners(String keyword, Pageable pageable) {
+    Page<User> users = userRepository.findByRoleAndFullNameContainingIgnoreCaseOrEmailContainingIgnoreCase(
+            "user", keyword, keyword, pageable);
+    return users.map(this::toResponse);
   }
 
   @Override
@@ -146,15 +167,11 @@ public class UserServiceImpl implements UserService {
     User user = userRepository.findByEmail(request.getEmail())
             .orElseThrow(() -> new RuntimeException("Không tìm thấy người dùng"));
 
-    // So sánh mật khẩu cũ (đã mã hóa trong DB)
     if (!passwordEncoder.matches(request.getCurrentPassword(), user.getPassword())) {
       throw new RuntimeException("Mật khẩu hiện tại không đúng");
     }
 
-    // Mã hóa mật khẩu mới và lưu lại
     user.setPassword(passwordEncoder.encode(request.getNewPassword()));
     userRepository.save(user);
   }
-
-
 }

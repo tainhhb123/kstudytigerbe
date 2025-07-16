@@ -68,4 +68,46 @@ public class UserProgressServiceImpl implements UserProgressService {
         }
     }
 
+    @Override
+    public Page<UserProgressResponse> getUserProgressList(String keyword, Pageable pageable) {
+        Page<User> users = userRepository.findByFullNameContainingIgnoreCaseOrEmailContainingIgnoreCase(keyword, keyword, pageable);
+
+        List<UserProgressResponse> responses = users.getContent().stream().map(user -> {
+            List<UserProgress> progresses = userProgressRepository.findByUser_UserId(user.getUserId());
+            int completedLessons = (int) progresses.stream().filter(UserProgress::getIsLessonCompleted).count();
+            int totalLessons = progresses.size();
+            UserProgress latest = progresses.stream()
+                    .max(Comparator.comparing(UserProgress::getLastAccessed, Comparator.nullsLast(Comparator.naturalOrder())))
+                    .orElse(null);
+
+            String currentLevel = latest != null && latest.getLesson() != null && latest.getLesson().getLevel() != null
+                    ? latest.getLesson().getLevel().getLevelName() : "";
+            String currentLesson = latest != null && latest.getLesson() != null
+                    ? latest.getLesson().getLessonName() : "";
+
+            double progressPercentage = totalLessons > 0 ? (completedLessons * 100.0) / totalLessons : 0.0;
+
+            // Chuyển LocalDate sang LocalDateTime nếu cần
+            java.time.LocalDateTime joinDateTime = user.getJoinDate() != null
+                    ? user.getJoinDate().atStartOfDay()
+                    : null;
+
+            return UserProgressResponse.builder()
+                    .userId(user.getUserId())
+                    .fullName(user.getFullName())
+                    .email(user.getEmail())
+                    .avatarImage(user.getAvatarImage())
+                    .joinDate(joinDateTime)
+                    .currentLevel(currentLevel)
+                    .currentLesson(currentLesson)
+                    .completedLessons(completedLessons)
+                    .totalLessons(totalLessons)
+                    .progressPercentage(progressPercentage)
+                    .lastAccessed(latest != null ? latest.getLastAccessed() : null)
+                    .status(String.valueOf(user.getUserStatus()))
+                    .build();
+        }).collect(Collectors.toList());
+
+        return new PageImpl<>(responses, pageable, users.getTotalElements());
+    }
 }

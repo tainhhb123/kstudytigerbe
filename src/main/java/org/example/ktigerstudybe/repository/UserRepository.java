@@ -27,4 +27,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     // UserRepository - thêm method này
     @Query("SELECT u FROM User u WHERE u.userStatus = 1 AND u.email IS NOT NULL")
     List<User> findAllActiveUsers();
+
+    Page<User> findByFullNameContainingIgnoreCaseOrEmailContainingIgnoreCase(String fullName, String email, Pageable pageable);
+
 }

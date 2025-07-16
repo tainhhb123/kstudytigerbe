@@ -7,4 +7,5 @@ public class LessonResponse {
     private Long lessonId;
     private String lessonName;
     private String lessonDescription;
+    private Long levelId;
 }

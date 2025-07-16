@@ -6,8 +6,10 @@ import org.example.ktigerstudybe.dto.resp.LessonResponse;
 import org.example.ktigerstudybe.dto.resp.LessonWithProgressResponse;
 import org.example.ktigerstudybe.dto.resp.UserXPResponse;
 import org.example.ktigerstudybe.model.Lesson;
+import org.example.ktigerstudybe.model.Level;
 import org.example.ktigerstudybe.model.UserProgress;
 import org.example.ktigerstudybe.repository.LessonRepository;
+import org.example.ktigerstudybe.repository.LevelRepository;
 import org.example.ktigerstudybe.repository.UserProgressRepository;
 import org.example.ktigerstudybe.repository.UserRepository;
 import org.example.ktigerstudybe.service.userxp.UserXPService;
@@ -20,10 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -33,11 +32,12 @@ public class LessonServiceImpl implements LessonService {
     private LessonRepository lessonRepository;
     @Autowired
     private UserProgressRepository userProgressRepository;
-
     @Autowired
     private UserRepository userRepository;
     @Autowired
     private UserXPService userXPService;
+    @Autowired
+    private LevelRepository levelRepository;
 
     // Mapping từ Entity sang Response DTO
     private LessonResponse toResponse(Lesson lesson) {
@@ -45,6 +45,9 @@ public class LessonServiceImpl implements LessonService {
         resp.setLessonId(lesson.getLessonId());
         resp.setLessonName(lesson.getLessonName());
         resp.setLessonDescription(lesson.getLessonDescription());
+        if (lesson.getLevel() != null) {
+            resp.setLevelId(lesson.getLevel().getLevelId());
+        }
         return resp;
     }
 
@@ -53,6 +56,11 @@ public class LessonServiceImpl implements LessonService {
         Lesson lesson = new Lesson();
         lesson.setLessonName(req.getLessonName());
         lesson.setLessonDescription(req.getLessonDescription());
+        if (req.getLevelId() != null) {
+            Level level = levelRepository.findById(req.getLevelId())
+                    .orElseThrow(() -> new IllegalArgumentException("Level not found"));
+            lesson.setLevel(level);
+        }
         return lesson;
     }
 
@@ -69,6 +77,11 @@ public class LessonServiceImpl implements LessonService {
                 .orElseThrow(() -> new IllegalArgumentException("Lesson not found with id: " + lessonId));
         lesson.setLessonName(request.getLessonName());
         lesson.setLessonDescription(request.getLessonDescription());
+        if (request.getLevelId() != null) {
+            Level level = levelRepository.findById(request.getLevelId())
+                    .orElseThrow(() -> new IllegalArgumentException("Level not found"));
+            lesson.setLevel(level);
+        }
         lesson = lessonRepository.save(lesson);
         return toResponse(lesson);
     }
@@ -134,8 +147,6 @@ public class LessonServiceImpl implements LessonService {
         return response;
     }
 
-    //admin
-    // admin
     @Override
     public Page<LessonResponse> getLessons(int page, int size, Long levelId, String keyword) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("lessonName").ascending());
@@ -156,17 +167,14 @@ public class LessonServiceImpl implements LessonService {
     @Override
     @Transactional
     public Map<String, Object> completeLesson(Long userId, Long lessonId, Integer score) {
-        // ✅ Kiểm tra UserProgress để xem đã hoàn thành chưa
         Optional<UserProgress> existingProgressOpt = userProgressRepository
                 .findByUser_UserIdAndLesson_LessonId(userId, lessonId);
 
         UserProgress existingProgress = existingProgressOpt.orElse(null);
 
-        // ✅ Kiểm tra lần đầu hoàn thành dựa trên IsLessonCompleted
         boolean isFirstTimeCompletion = (existingProgress == null ||
                 !existingProgress.getIsLessonCompleted());
 
-        // ✅ Cập nhật/tạo mới UserProgress (chỉ lưu trạng thái hoàn thành)
         UserProgress progress = existingProgress != null ? existingProgress : new UserProgress();
         progress.setUser(userRepository.findById(userId).orElseThrow());
         progress.setLesson(lessonRepository.findById(lessonId).orElseThrow());
@@ -175,10 +183,8 @@ public class LessonServiceImpl implements LessonService {
 
         userProgressRepository.save(progress);
 
-        // ✅ Chỉ cộng XP nếu là lần đầu hoàn thành
         UserXPResponse xpData = null;
         if (isFirstTimeCompletion) {
-            // Tạo request object
             UserXPUpdateRequest xpRequest = new UserXPUpdateRequest();
             xpRequest.setUserId(userId);
             xpRequest.setXpToAdd(score);

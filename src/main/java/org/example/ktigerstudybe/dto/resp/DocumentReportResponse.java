@@ -12,7 +12,8 @@ import java.time.LocalDateTime;
 public class DocumentReportResponse {
     private Long reportId;
     private Long userId;
-    private String userName; // Optional: thêm thông tin người dùng
+    private String userName;
+    private String fullName; // Optional: thêm thông tin người dùng
     private Long listId;
     private String listTitle; // Optional: thêm tiêu đề tài liệu
     private String reason;

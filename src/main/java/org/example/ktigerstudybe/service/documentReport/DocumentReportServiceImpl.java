@@ -111,6 +111,7 @@ public class DocumentReportServiceImpl implements DocumentReportService {
                 .reportId(report.getReportId())
                 .userId(report.getUser().getUserId())
                 .userName(report.getUser().getUserName())
+                .fullName(report.getUser().getFullName())
                 .listId(report.getDocumentList().getListId())
                 .listTitle(report.getDocumentList().getTitle())
                 .reason(report.getReason())

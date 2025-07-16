@@ -5,6 +5,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.Query;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -21,4 +23,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
     long countByUserStatus(int status);
 
     long countByJoinDateAfter(java.time.LocalDate date);
+
+    // UserRepository - thêm method này
+    @Query("SELECT u FROM User u WHERE u.userStatus = 1 AND u.email IS NOT NULL")
+    List<User> findAllActiveUsers();
 }

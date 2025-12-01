@@ -7,28 +7,32 @@ import org.springframework.web.client.RestTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
 @Service
-public class GeminiAIService {
+public class GroqAIService {
 
-    private static final Logger logger = LoggerFactory.getLogger(GeminiAIService.class);
+    private static final Logger logger = LoggerFactory.getLogger(GroqAIService.class);
 
-    @Value("${gemini.api.key}")
-    private String geminiApiKey;
+    @Value("${groq.api.key}")
+    private String groqApiKey;
 
-    @Value("${gemini.api.url:https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent}")
-    private String geminiApiUrl;
+    @Value("${groq.api.url:https://api.groq.com/openai/v1/chat/completions}")
+    private String groqApiUrl;
 
-    @Value("${gemini.api.mock:false}")
+    @Value("${groq.api.model:llama-3.1-8b-instant}")
+    private String groqModel;
+
+    @Value("${groq.api.mock:false}")
     private boolean useMockResponse;
 
     private final RestTemplate restTemplate;
     private final Random random = new Random();
 
-    public GeminiAIService() {
+    public GroqAIService() {
         this.restTemplate = new RestTemplate();
     }
 
@@ -40,43 +44,42 @@ public class GeminiAIService {
         }
 
         try {
-            String prompt = buildKoreanPrompt(userMessage, scenario, difficulty);
-            logger.info("Calling Gemini API with prompt length: {}", prompt.length());
+            String systemPrompt = buildKoreanPrompt(scenario, difficulty);
+            logger.info("Calling Groq API with model: {}", groqModel);
+
+            // Build messages array for Groq API
+            List<Map<String, String>> messages = new ArrayList<>();
+            messages.add(Map.of("role", "system", "content", systemPrompt));
+            messages.add(Map.of("role", "user", "content", userMessage));
 
             Map<String, Object> requestBody = Map.of(
-                    "contents", List.of(
-                            Map.of("parts", List.of(
-                                    Map.of("text", prompt)
-                            ))
-                    ),
-                    "generationConfig", Map.of(
-                            "temperature", 0.8,
-                            "maxOutputTokens", 150,
-                            "topP", 0.9,
-                            "topK", 40
-                    )
+                    "model", groqModel,
+                    "messages", messages,
+                    "temperature", 0.8,
+                    "max_tokens", 150,
+                    "top_p", 0.9
             );
 
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
+            headers.setBearerAuth(groqApiKey);
 
             HttpEntity<Map<String, Object>> entity = new HttpEntity<>(requestBody, headers);
 
-            String url = geminiApiUrl + "?key=" + geminiApiKey;
-            ResponseEntity<Map> response = restTemplate.postForEntity(url, entity, Map.class);
+            ResponseEntity<Map> response = restTemplate.postForEntity(groqApiUrl, entity, Map.class);
 
             String result = extractResponseText(response.getBody());
-            logger.info("Gemini API response: {}", result);
+            logger.info("Groq API response: {}", result);
             return result;
 
         } catch (Exception e) {
-            logger.error("Gemini API Error: {}", e.getMessage(), e);
+            logger.error("Groq API Error: {}", e.getMessage(), e);
             logger.info("Falling back to mock response");
             return getMockResponse(userMessage, scenario, difficulty);
         }
     }
 
-    private String buildKoreanPrompt(String userMessage, String scenario, String difficulty) {
+    private String buildKoreanPrompt(String scenario, String difficulty) {
         String rolePrompt = switch (scenario) {
             case "restaurant" ->
                     "Bạn là Min-jun (민준), 25 tuổi, nhân viên nhà hàng Hàn Quốc vui vẻ và am hiểu về đồ ăn. " +
@@ -192,9 +195,10 @@ public class GeminiAIService {
                         "4. Hỏi lại hoặc gợi ý để tiếp tục cuộc trò chuyện. " +
                         "5. Dùng emoji phù hợp (😊, 😄, 🤔, 👍) nhưng không quá nhiều. " +
                         "6. Phản ứng cụ thể với nội dung tin nhắn của người dùng. " +
-                        "7. Đưa ra thông tin chi tiết, hữu ích trong ngữ cảnh. "+
+                        "7. Đưa ra thông tin chi tiết, hữu ích trong ngữ cảnh. " +
                         "8. LUÔN sử dụng dấu câu rõ ràng cho từng câu: dấu chấm (.), dấu hỏi (?), dấu cảm thán (!) ở cuối câu phù hợp. Không được bỏ dấu câu.";
-                        String examplePrompt = switch (scenario) {
+
+        String examplePrompt = switch (scenario) {
             case "restaurant" ->
                     "\nVÍ DỤ CÁCH TRẢ LỜI:\n" +
                             "User: 메뉴 추천해 주세요\n" +
@@ -225,25 +229,19 @@ public class GeminiAIService {
             default -> "";
         };
 
-        return rolePrompt + personalityPrompt + difficultyPrompt + contextPrompt + responseRules + examplePrompt +
-                "\n\n현재 상황에서 사용자가 말했습니다: \"" + userMessage + "\"" +
-                "\n당신의 자연스러운 응답 (tiếng Hàn only):";
+        return rolePrompt + personalityPrompt + difficultyPrompt + contextPrompt + responseRules + examplePrompt;
     }
 
     private String extractResponseText(Map<String, Object> responseBody) {
         try {
             @SuppressWarnings("unchecked")
-            List<Map<String, Object>> candidates = (List<Map<String, Object>>) responseBody.get("candidates");
-            if (candidates != null && !candidates.isEmpty()) {
+            List<Map<String, Object>> choices = (List<Map<String, Object>>) responseBody.get("choices");
+            if (choices != null && !choices.isEmpty()) {
                 @SuppressWarnings("unchecked")
-                Map<String, Object> content = (Map<String, Object>) candidates.get(0).get("content");
-                if (content != null) {
-                    @SuppressWarnings("unchecked")
-                    List<Map<String, Object>> parts = (List<Map<String, Object>>) content.get("parts");
-                    if (parts != null && !parts.isEmpty()) {
-                        String text = (String) parts.get(0).get("text");
-                        return cleanResponse(text);
-                    }
+                Map<String, Object> message = (Map<String, Object>) choices.get(0).get("message");
+                if (message != null) {
+                    String text = (String) message.get("content");
+                    return cleanResponse(text);
                 }
             }
             return "죄송해요, 다시 말해 주세요.";
@@ -253,65 +251,51 @@ public class GeminiAIService {
         }
     }
 
-    // [CHANGED] Thêm hàm dịch sang tiếng Việt
+    // Dịch sang tiếng Việt
     public String translateToVietnamese(String koreanText) {
         try {
-            // Prompt yêu cầu dịch sang tiếng Việt tự nhiên
             String prompt = "Hãy dịch câu sau sang tiếng Việt tự nhiên, không thêm giải thích:\n" + koreanText;
 
+            List<Map<String, String>> messages = new ArrayList<>();
+            messages.add(Map.of("role", "user", "content", prompt));
+
             Map<String, Object> requestBody = Map.of(
-                    "contents", List.of(
-                            Map.of("parts", List.of(
-                                    Map.of("text", prompt)
-                            ))
-                    ),
-                    "generationConfig", Map.of(
-                            "temperature", 0.2,
-                            "maxOutputTokens", 150
-                    )
+                    "model", groqModel,
+                    "messages", messages,
+                    "temperature", 0.2,
+                    "max_tokens", 150
             );
 
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
+            headers.setBearerAuth(groqApiKey);
 
             HttpEntity<Map<String, Object>> entity = new HttpEntity<>(requestBody, headers);
-            String url = geminiApiUrl + "?key=" + geminiApiKey;
 
-            ResponseEntity<Map> response = restTemplate.postForEntity(url, entity, Map.class);
+            ResponseEntity<Map> response = restTemplate.postForEntity(groqApiUrl, entity, Map.class);
             String result = extractResponseText(response.getBody());
-            logger.info("Gemini Translate result: {}", result);
+            logger.info("Groq Translate result: {}", result);
             return result;
         } catch (Exception e) {
-            logger.error("Gemini Translate Error: {}", e.getMessage(), e);
+            logger.error("Groq Translate Error: {}", e.getMessage(), e);
             return "(Không dịch được)";
         }
     }
 
-
-
-
-
-    // giữ dấu câu và không xóa quá nhiều
     private String cleanResponse(String response) {
         if (response == null) return "네, 알겠어요!";
-        // Chỉ loại bỏ phần giải thích không cần thiết, giữ lại dấu chấm, dấu hỏi, dấu cảm
         String cleaned = response
-                .replaceAll("\\([^)]*\\)", "")  // xóa (phần giải thích)
-                .replaceAll("\\[[^]]*\\]", "")  // xóa [phần giải thích]
-                .replaceAll("^AI:", "")         // xóa tiền tố AI:
-                .replaceAll("^User:", "")       // xóa tiền tố User:
+                .replaceAll("\\([^)]*\\)", "")
+                .replaceAll("\\[[^]]*\\]", "")
+                .replaceAll("^AI:", "")
+                .replaceAll("^User:", "")
                 .trim();
         return cleaned.isEmpty() ? "네!" : cleaned.trim();
     }
 
-    private boolean containsKorean(String text) {
-        return text.matches(".*[가-힣].*");
-    }
-
     private String getMockResponse(String userMessage, String scenario, String difficulty) {
-        // Simulate API delay
         try {
-            Thread.sleep(800 + random.nextInt(1200)); // 0.8-2s delay
+            Thread.sleep(800 + random.nextInt(1200));
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }

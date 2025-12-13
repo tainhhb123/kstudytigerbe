@@ -55,17 +55,12 @@ public class AuthController {
         }
     }
 
+
     @PostMapping("/forgot-password")
     @Transactional
     public ResponseEntity<?> forgotPassword(@RequestBody ForgotPasswordRequest request) {
-        authService.forgotPassword(request.getEmail());
+        authService.forgotPassword(request.getEmail(), request.getPlatform()); // thêm platform
         return ResponseEntity.ok("Đã gửi email đặt lại mật khẩu. Vui lòng kiểm tra hộp thư.");
-    }
-
-    @PostMapping("/reset-password")
-    public ResponseEntity<?> resetPassword(@RequestBody ResetPasswordRequest request) {
-        authService.resetPassword(request.getToken(), request.getNewPassword());
-        return ResponseEntity.ok("Đặt lại mật khẩu thành công!");
     }
 
     // ✅ Test endpoint

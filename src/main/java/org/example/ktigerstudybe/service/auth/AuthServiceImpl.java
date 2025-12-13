@@ -102,20 +102,17 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public void forgotPassword(String email) {
+    public void forgotPassword(String email, String platform) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Không tìm thấy email này!"));
 
-        // ✅ NEW: Check if user account is frozen
         if (user.getUserStatus() == 0) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN,
                     "Tài khoản của bạn đã bị đóng băng. Vui lòng liên hệ admin để được hỗ trợ.");
         }
 
-        // Xóa token cũ nếu có
         tokenRepository.deleteByUser(user);
 
-        // Tạo token mới
         String token = UUID.randomUUID().toString();
         LocalDateTime expiry = LocalDateTime.now().plusMinutes(15);
 
@@ -125,7 +122,14 @@ public class AuthServiceImpl implements AuthService {
         prt.setExpiryDate(expiry);
         tokenRepository.save(prt);
 
-        String resetLink = "http://localhost:5173/reset-password?token=" + token;
+        // ✅ THAY ĐỔI: Tạo link dựa trên platform
+        String resetLink;
+        if ("mobile".equalsIgnoreCase(platform)) {
+            resetLink = "tigerkorean://reset-password?token=" + token;
+        } else {
+            resetLink = "http://localhost:5173/reset-password?token=" + token;
+        }
+
         String content = "Click vào link này để đặt lại mật khẩu (có hiệu lực 15 phút): " + resetLink;
         emailService.sendSimpleEmail(email, "Yêu cầu đặt lại mật khẩu", content);
     }

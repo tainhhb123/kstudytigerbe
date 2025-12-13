@@ -9,7 +9,7 @@ import org.example.ktigerstudybe.dto.resp.GoogleSignInResponse;
 public interface AuthService {
     AuthResponse signUp(SignUpRequest request);
     AuthResponse signIn(SignInRequest request);
-    void forgotPassword(String email);
+    void forgotPassword(String email, String platform);
     void resetPassword(String token, String newPassword);
 
     GoogleSignInResponse googleSignIn(GoogleSignInRequest request);

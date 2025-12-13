@@ -11,7 +11,7 @@ import org.example.ktigerstudybe.model.User;
 import org.example.ktigerstudybe.repository.ChatConversationRepository;
 import org.example.ktigerstudybe.repository.ChatMessageRepository;
 import org.example.ktigerstudybe.repository.UserRepository;
-import org.example.ktigerstudybe.service.ai.GeminiAIService;
+import org.example.ktigerstudybe.service.ai.GroqAIService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,7 +33,7 @@ public class ChatServiceImpl implements ChatService {
     private UserRepository userRepository;
 
     @Autowired
-    private GeminiAIService geminiAIService;
+    private GroqAIService groqAIService;
 
     @Override
     public ChatConversationResponse createConversation(CreateChatConversationRequest request) {
@@ -58,14 +58,14 @@ public class ChatServiceImpl implements ChatService {
         userMessage = messageRepository.save(userMessage);
 
         // 2) Gọi AI sinh phản hồi tiếng Hàn
-        String aiResponse = geminiAIService.generateKoreanResponse(
+        String aiResponse = groqAIService.generateKoreanResponse(
                 request.getContent(),
                 conversation.getScenario(),
                 conversation.getDifficulty()
         );
 
         // 3) Dịch sang tiếng Việt
-        String viTranslation = geminiAIService.translateToVietnamese(aiResponse);
+        String viTranslation = groqAIService.translateToVietnamese(aiResponse);
 
         // 4) Lưu AI message (tiếng Hàn)
         ChatMessage aiMessage = new ChatMessage(conversation, aiResponse, "ai");

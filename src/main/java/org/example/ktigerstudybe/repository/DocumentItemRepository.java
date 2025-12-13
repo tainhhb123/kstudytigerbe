@@ -9,15 +9,4 @@ import java.util.List;
 
 public interface DocumentItemRepository extends JpaRepository<DocumentItem, Long> {
 
-    // Lấy danh sách DocumentItem theo ListID
-    List<DocumentItem> findByDocumentList_ListId(Long listId);
-
-    // Xoá tất cả DocumentItem theo ListID
-    void deleteByDocumentList_ListId(Long listId);
-
-    Page<DocumentItem> findByDocumentList_ListId(Long listId, Pageable pageable);
-
-    Page<DocumentItem> findByDocumentList_ListIdAndWordContainingIgnoreCase(
-            Long listId, String word, Pageable pageable
-    );
 }

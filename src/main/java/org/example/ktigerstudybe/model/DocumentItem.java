@@ -14,22 +14,22 @@ public class DocumentItem {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "WordID")
+    @Column(name = "word_id")
     private Long wordId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "ListID", nullable = false)
+    @ManyToOne
+    @JoinColumn(name = "list_id", nullable = false)
     private DocumentList documentList;
 
-    @Column(name = "Word", nullable = false)
+    @Column(name = "word", nullable = false)
     private String word;
 
-    @Column(name = "Meaning", nullable = false)
+    @Column(name = "meaning", nullable = false)
     private String meaning;
 
-    @Column(name = "Example")
+    @Column(name = "example", columnDefinition = "TEXT")
     private String example;
 
-    @Column(name = "VocabImage")
+    @Column(name = "vocab_image")
     private String vocabImage;
 }

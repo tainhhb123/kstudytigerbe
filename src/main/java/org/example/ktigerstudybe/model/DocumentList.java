@@ -19,42 +19,32 @@ import java.util.List;
 @Entity
 @Table(name = "document_list")
 public class DocumentList {
+        @Id
+        @GeneratedValue(strategy = GenerationType.IDENTITY)
+        @Column(name = "list_id")
+        private Long listId;
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "ListID")
-    private Long listId;
+        // ===== FK tới User =====
+        @ManyToOne
+        @JoinColumn(name = "user_id", nullable = false)
+        private User user;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "UserID", nullable = false)
-    private User user;
+        @Column(name = "title", nullable = false)
+        private String title;
 
-    @Column(name = "Title", nullable = false)
-    private String title;
+        @Column(name = "description")
+        private String description;
 
-    @Column(name = "Description")
-    private String description;
+        @Column(name = "created_at")
+        private LocalDateTime createdAt;
 
-    @Column(name = "Type")
-    private String type;
+        @Column(name = "is_public")
+        private Boolean isPublic = false;
 
-    @Column(name = "CreatedAt", nullable = false, updatable = false)
-    private LocalDateTime createdAt;
+        @PrePersist
+        protected void onCreate() {
+            this.createdAt = LocalDateTime.now();
 
-    @Column(name = "IsPublic", nullable = false)
-    private int isPublic;
-
-    // Phương thức này tự động gọi trước khi persist entity vào DB
-    @PrePersist
-    protected void onCreate() {
-        this.createdAt = LocalDateTime.now();
     }
 
-
-    @OneToMany(
-            mappedBy = "documentList",
-            cascade = CascadeType.REMOVE,
-            orphanRemoval = true
-    )
-    private List<DocumentReport> reports = new ArrayList<>();
 }

@@ -16,7 +16,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -57,11 +59,24 @@ public class ChatServiceImpl implements ChatService {
         ChatMessage userMessage = new ChatMessage(conversation, request.getContent(), "user");
         userMessage = messageRepository.save(userMessage);
 
-        // 2) Gọi AI sinh phản hồi tiếng Hàn
+        // ⭐ NEW: Lấy conversation history (10 messages cuối, trừ message vừa lưu)
+        List<ChatMessage> allMessages = messageRepository.findByConversation_ConversationIdOrderByTimestamp(conversationId);
+        List<Map<String, String>> conversationHistory = new ArrayList<>();
+
+        // Lấy 10 messages cuối (không bao gồm message vừa gửi)
+        int startIndex = Math.max(0, allMessages.size() - 11); // -11 vì message cuối là user message vừa lưu
+        for (int i = startIndex; i < allMessages.size() - 1; i++) {
+            ChatMessage msg = allMessages.get(i);
+            String role = msg.getMessageType().equals("user") ? "user" : "assistant";
+            conversationHistory.add(Map.of("role", role, "content", msg.getContent()));
+        }
+
+        // 2) Gọi AI sinh phản hồi tiếng Hàn WITH conversation history
         String aiResponse = groqAIService.generateKoreanResponse(
                 request.getContent(),
                 conversation.getScenario(),
-                conversation.getDifficulty()
+                conversation.getDifficulty(),
+                conversationHistory  // ⭐ Pass history here
         );
 
         // 3) Dịch sang tiếng Việt

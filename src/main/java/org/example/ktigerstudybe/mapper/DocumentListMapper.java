@@ -23,9 +23,9 @@ public class DocumentListMapper {
         dto.setAvatarImage(entity.getUser().getAvatarImage());
         dto.setTitle(entity.getTitle());
         dto.setDescription(entity.getDescription());
-        dto.setType(entity.getType());
+        //dto.setType(entity.getType());
         dto.setCreatedAt(entity.getCreatedAt());
-        dto.setIsPublic(entity.getIsPublic());
+        //dto.setIsPublic(entity.getIsPublic());
         return dto;
     }
 }

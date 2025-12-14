@@ -41,7 +41,7 @@ public class ClassDocumentListServiceImpl implements ClassDocumentListService {
         res.setFullName(dl.getUser().getFullName());
         res.setAvatarImage(dl.getUser().getAvatarImage());
         res.setDescription(dl.getDescription());
-        res.setType(dl.getType());
+        //es.setType(dl.getType());
         return res;
     }
 

@@ -33,7 +33,7 @@ public class AnswerChoiceServiceImpl implements AnswerChoiceService {
 
     @Override
     public List<AnswerChoiceResponse> getChoicesByQuestion(Long questionId) {
-        return answerChoiceRepository.findByQuestion_QuestionId(questionId)
+        return answerChoiceRepository.findByQuestionId(questionId)
                 .stream()
                 .map(this::toResponse)
                 .collect(Collectors.toList());

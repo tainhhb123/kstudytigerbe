@@ -36,6 +36,7 @@ public class ExamSectionServiceImpl implements ExamSectionService {
         resp.setSectionOrder(section.getSectionOrder());
         resp.setTotalQuestions(section.getTotalQuestions());
         resp.setDurationMinutes(section.getDurationMinutes());
+        resp.setAudioUrl(section.getAudioUrl());
 
         return resp;
     }

@@ -18,4 +18,6 @@ public class ExamSectionResponse {
     private Integer sectionOrder;
     private Integer totalQuestions;
     private Integer durationMinutes;
+
+    private String audioUrl;
 }

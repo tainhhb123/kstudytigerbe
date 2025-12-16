@@ -1,9 +1,12 @@
 package org.example.ktigerstudybe.service.question;
 
 import org.example.ktigerstudybe.dto.req.QuestionRequest;
+import org.example.ktigerstudybe.dto.resp.AnswerChoiceResponse;
 import org.example.ktigerstudybe.dto.resp.QuestionResponse;
+import org.example.ktigerstudybe.model.AnswerChoice;
 import org.example.ktigerstudybe.model.ExamSection;
 import org.example.ktigerstudybe.model.Question;
+import org.example.ktigerstudybe.repository.AnswerChoiceRepository;
 import org.example.ktigerstudybe.repository.ExamSectionRepository;
 import org.example.ktigerstudybe.repository.QuestionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +24,21 @@ public class QuestionServiceImpl implements QuestionService {
     @Autowired
     private ExamSectionRepository examSectionRepository;
 
-    // ===== Mapper =====
+    @Autowired
+    private AnswerChoiceRepository answerChoiceRepository; // THÊM
+
+    // ===== Mapper for AnswerChoice ===== THÊM METHOD NÀY
+    private AnswerChoiceResponse toAnswerChoiceResponse(AnswerChoice ac) {
+        AnswerChoiceResponse resp = new AnswerChoiceResponse();
+        resp.setChoiceId(ac.getChoiceId());
+        resp.setQuestionId(ac.getQuestion().getQuestionId());
+        resp.setChoiceLabel(ac.getChoiceLabel());
+        resp.setChoiceText(ac.getChoiceText());
+        resp.setIsCorrect(ac.getIsCorrect());
+        return resp;
+    }
+
+    // ===== Mapper for Question ===== SỬA LẠI METHOD NÀY
     private QuestionResponse toResponse(Question q) {
         QuestionResponse resp = new QuestionResponse();
 
@@ -35,6 +52,14 @@ public class QuestionServiceImpl implements QuestionService {
         resp.setAudioUrl(q.getAudioUrl());
         resp.setImageUrl(q.getImageUrl());
         resp.setPoints(q.getPoints());
+
+        // THÊM PHẦN NÀY - Map choices
+        List<AnswerChoice> choices = answerChoiceRepository.findByQuestionId(q.getQuestionId());
+        resp.setChoices(
+                choices.stream()
+                        .map(this::toAnswerChoiceResponse)
+                        .collect(Collectors.toList())
+        );
 
         return resp;
     }
@@ -57,7 +82,6 @@ public class QuestionServiceImpl implements QuestionService {
 
     @Override
     public QuestionResponse createQuestion(QuestionRequest request) {
-
         ExamSection section = examSectionRepository.findById(request.getSectionId())
                 .orElseThrow(() -> new IllegalArgumentException("ExamSection not found"));
 
@@ -81,7 +105,6 @@ public class QuestionServiceImpl implements QuestionService {
 
     @Override
     public QuestionResponse updateQuestion(Long id, QuestionRequest request) {
-
         Question q = questionRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Question not found"));
 

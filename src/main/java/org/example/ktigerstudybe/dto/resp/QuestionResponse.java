@@ -1,10 +1,14 @@
 package org.example.ktigerstudybe.dto.resp;
 
-import lombok.Data;
+import lombok.*;
 import org.example.ktigerstudybe.enums.QuestionType;
 
 import java.math.BigDecimal;
-
+import java.util.List;
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Data
 public class QuestionResponse {
 
@@ -27,4 +31,6 @@ public class QuestionResponse {
     private String imageUrl;
 
     private BigDecimal points;
+    private List<AnswerChoiceResponse> choices;
+
 }

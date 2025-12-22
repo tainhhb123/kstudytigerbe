@@ -110,4 +110,10 @@ public class UserProgressServiceImpl implements UserProgressService {
 
         return new PageImpl<>(responses, pageable, users.getTotalElements());
     }
+
+    // Thêm method này
+    @Override
+    public List<UserProgress> findByUserId(Long userId) {
+        return userProgressRepository.findByUser_UserId(userId);
+    }
 }

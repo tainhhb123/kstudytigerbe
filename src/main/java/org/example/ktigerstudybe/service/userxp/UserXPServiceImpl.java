@@ -116,5 +116,8 @@ public class UserXPServiceImpl implements UserXPService {
                         u.getTotalXP()
                 )).toList();
     }
+
+
+
 }
 

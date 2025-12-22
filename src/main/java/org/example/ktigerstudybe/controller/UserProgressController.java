@@ -1,7 +1,9 @@
 package org.example.ktigerstudybe.controller;
 
 import org.example.ktigerstudybe.dto.req.UserProgressRequest;
+import org.example.ktigerstudybe.dto.resp.UserProgressDTO;
 import org.example.ktigerstudybe.dto.resp.UserProgressResponse;
+import org.example.ktigerstudybe.model.UserProgress;
 import org.example.ktigerstudybe.service.userprogress.UserProgressService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -11,7 +13,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/user-progress")
@@ -30,7 +34,7 @@ public class UserProgressController {
         return ResponseEntity.ok(response);
     }
 
-    // NEW: Admin endpoints để lấy tiến trình học tập
+    // Admin endpoints để lấy tiến trình học tập
     @GetMapping
     public Page<UserProgressResponse> getUserProgressList(
             @RequestParam(defaultValue = "") String keyword,
@@ -39,5 +43,28 @@ public class UserProgressController {
     ) {
         Pageable pageable = PageRequest.of(page, size);
         return userProgressService.getUserProgressList(keyword, pageable);
+    }
+
+    // Lấy tất cả progress của user theo userId cho Profile page - trả về DTO
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<List<UserProgressDTO>> getUserProgress(@PathVariable Long userId) {
+        try {
+            List<UserProgress> progressList = userProgressService.findByUserId(userId);
+
+            // Convert sang DTO để tránh infinite recursion
+            List<UserProgressDTO> dtoList = progressList.stream()
+                    .map(p -> UserProgressDTO.builder()
+                            .progressId(p.getProgressId())
+                            .lessonId(p.getLesson() != null ? p.getLesson().getLessonId() : null)
+                            .lessonName(p.getLesson() != null ? p.getLesson().getLessonName() : null)
+                            .lastAccessed(p.getLastAccessed())
+                            .isLessonCompleted(p.getIsLessonCompleted())
+                            .build())
+                    .collect(Collectors.toList());
+
+            return ResponseEntity.ok(dtoList);
+        } catch (Exception e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 }

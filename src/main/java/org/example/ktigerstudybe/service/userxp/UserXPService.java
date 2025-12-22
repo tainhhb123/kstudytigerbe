@@ -3,6 +3,7 @@ package org.example.ktigerstudybe.service.userxp;
 import org.example.ktigerstudybe.dto.req.UserXPUpdateRequest;
 import org.example.ktigerstudybe.dto.resp.LeaderboardResponse;
 import org.example.ktigerstudybe.dto.resp.UserXPResponse;
+import org.example.ktigerstudybe.model.UserXP;
 
 import java.util.List;
 

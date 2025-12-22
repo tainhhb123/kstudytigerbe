@@ -3,8 +3,10 @@ package org.example.ktigerstudybe.controller;
 import org.example.ktigerstudybe.dto.req.UserXPUpdateRequest;
 import org.example.ktigerstudybe.dto.resp.LeaderboardResponse;
 import org.example.ktigerstudybe.dto.resp.UserXPResponse;
+import org.example.ktigerstudybe.model.UserXP;
 import org.example.ktigerstudybe.service.userxp.UserXPService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -29,4 +31,6 @@ public class UserXPController {
     public List<LeaderboardResponse> getLeaderboard() {
         return userXPService.getLeaderboard();
     }
+
+
 }

@@ -58,7 +58,7 @@ public class Question {
      * - SHORT: text ngắn
      * - ESSAY: thường NULL (chấm tay)
      */
-    @Column(name = "correct_answer", length = 10)
+    @Column(name = "correct_answer", columnDefinition = "TEXT")
     private String correctAnswer;
 
     @Column(name = "points", precision = 5, scale = 2)

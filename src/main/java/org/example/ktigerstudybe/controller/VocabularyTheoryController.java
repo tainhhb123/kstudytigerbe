@@ -6,6 +6,7 @@ import org.example.ktigerstudybe.service.vocabularyTheory.VocabularyTheoryServic
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -36,12 +37,15 @@ public class VocabularyTheoryController {
 
     // Thêm mới vocabulary theory
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public VocabularyTheoryResponse createVocabularyTheory(@RequestBody VocabularyTheoryRequest request) {
         return vocabularyTheoryService.createVocabularyTheory(request);
     }
 
     // Sửa vocabulary theory
+
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<VocabularyTheoryResponse> updateVocabularyTheory(
             @PathVariable Long id,
             @RequestBody VocabularyTheoryRequest request) {
@@ -55,6 +59,7 @@ public class VocabularyTheoryController {
 
     // Xóa vocabulary theory
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> deleteVocabularyTheory(@PathVariable Long id) {
         vocabularyTheoryService.deleteVocabularyTheory(id);
         return ResponseEntity.noContent().build();
@@ -75,6 +80,7 @@ public class VocabularyTheoryController {
     //admin
     // NEW: GET paged vocab cho frontend
     @GetMapping("/lessons/{lessonId}/vocab/paged")
+    @PreAuthorize("hasRole('ADMIN')")
     public Page<VocabularyTheoryResponse> getVocabPaged(
             @PathVariable Long lessonId,
             @RequestParam(required = false) String searchTerm,

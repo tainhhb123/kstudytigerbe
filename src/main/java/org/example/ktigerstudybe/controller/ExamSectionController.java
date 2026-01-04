@@ -5,6 +5,7 @@ import org.example.ktigerstudybe.dto.resp.ExamSectionResponse;
 import org.example.ktigerstudybe.service.examSection.ExamSectionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -33,11 +34,13 @@ public class ExamSectionController {
 
     // Admin tạo section
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ExamSectionResponse createSection(@RequestBody ExamSectionRequest request) {
         return examSectionService.createSection(request);
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ExamSectionResponse> updateSection(
             @PathVariable Long id,
             @RequestBody ExamSectionRequest request
@@ -50,6 +53,7 @@ public class ExamSectionController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> deleteSection(@PathVariable Long id) {
         examSectionService.deleteSection(id);
         return ResponseEntity.noContent().build();

@@ -6,6 +6,7 @@ import org.example.ktigerstudybe.service.multiplechoicequestion.MultipleChoiceQu
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -37,11 +38,13 @@ public class MultipleChoiceQuestionController {
     }
 
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public MultipleChoiceQuestionResponse create(@RequestBody MultipleChoiceQuestionRequest request) {
         return service.create(request);
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<MultipleChoiceQuestionResponse> update(@PathVariable Long id, @RequestBody MultipleChoiceQuestionRequest request) {
         try {
             return ResponseEntity.ok(service.update(id, request));
@@ -51,6 +54,7 @@ public class MultipleChoiceQuestionController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         service.delete(id);
         return ResponseEntity.noContent().build();
@@ -59,6 +63,7 @@ public class MultipleChoiceQuestionController {
     //admin
     // Phân trang và tìm kiếm theo lessonId
     @GetMapping("/lesson/{lessonId}/paged")
+    @PreAuthorize("hasRole('ADMIN')")
     public Page<MultipleChoiceQuestionResponse> getByLessonIdPaged(
             @PathVariable Long lessonId,
             @RequestParam(defaultValue = "") String keyword,

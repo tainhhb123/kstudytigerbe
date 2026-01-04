@@ -5,6 +5,7 @@ import org.example.ktigerstudybe.dto.resp.QuestionResponse;
 import org.example.ktigerstudybe.service.question.QuestionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -33,11 +34,13 @@ public class QuestionController {
 
     // Admin tạo câu hỏi
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public QuestionResponse createQuestion(@RequestBody QuestionRequest request) {
         return questionService.createQuestion(request);
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<QuestionResponse> updateQuestion(
             @PathVariable Long id,
             @RequestBody QuestionRequest request
@@ -50,6 +53,7 @@ public class QuestionController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> deleteQuestion(@PathVariable Long id) {
         questionService.deleteQuestion(id);
         return ResponseEntity.noContent().build();

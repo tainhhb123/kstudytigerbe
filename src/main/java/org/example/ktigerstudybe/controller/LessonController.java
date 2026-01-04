@@ -7,6 +7,7 @@ import org.example.ktigerstudybe.service.lesson.LessonService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -46,16 +47,19 @@ public class LessonController {
 
 
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public LessonResponse createLesson(@RequestBody LessonRequest lessonRequest) {
         return lessonService.createLesson(lessonRequest);
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public LessonResponse updateLesson(@PathVariable Long id, @RequestBody LessonRequest lessonRequest) {
         return lessonService.updateLesson(id, lessonRequest);
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> deleteLesson(@PathVariable Long id) {
         lessonService.deleteLesson(id);
         return ResponseEntity.noContent().build();

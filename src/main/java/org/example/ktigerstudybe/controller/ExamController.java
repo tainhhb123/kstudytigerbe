@@ -5,6 +5,7 @@ import org.example.ktigerstudybe.dto.resp.ExamResponse;
 import org.example.ktigerstudybe.service.exam.ExamService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,12 +19,14 @@ public class ExamController {
 
     // Lấy tất cả exam (admin)
     @GetMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public List<ExamResponse> getAllExams() {
         return examService.getAllExams();
     }
 
     // Lấy exam đang active (user)
     @GetMapping("/active")
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     public List<ExamResponse> getActiveExams() {
         return examService.getActiveExams();
     }
@@ -38,11 +41,13 @@ public class ExamController {
     }
 
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ExamResponse createExam(@RequestBody ExamRequest request) {
         return examService.createExam(request);
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ExamResponse> updateExam(
             @PathVariable Long id,
             @RequestBody ExamRequest request
@@ -55,6 +60,7 @@ public class ExamController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> deleteExam(@PathVariable Long id) {
         examService.deleteExam(id);
         return ResponseEntity.noContent().build();

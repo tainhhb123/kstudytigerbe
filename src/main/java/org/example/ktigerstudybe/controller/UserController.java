@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -26,6 +27,7 @@ public class UserController {
 
   // Lấy tất cả user có role = "user" (có phân trang)
   @GetMapping("/learners")
+  @PreAuthorize("hasRole('ADMIN')")
   public Page<UserResponse> getAllLearners(
           @RequestParam(defaultValue = "0") int page,
           @RequestParam(defaultValue = "5") int size) {
@@ -34,6 +36,7 @@ public class UserController {
 
   // Tìm kiếm user có role = "user" (phân trang)
   @GetMapping("/learners/search")
+  @PreAuthorize("hasRole('ADMIN')")
   public Page<UserResponse> searchLearners(
           @RequestParam String keyword,
           @RequestParam(defaultValue = "0") int page,
@@ -54,12 +57,14 @@ public class UserController {
 
   // Tạo mới user
   @PostMapping
+  @PreAuthorize("hasRole('ADMIN')")
   public UserResponse createUser(@RequestBody UserRequest request) {
     return userService.createUser(request);
   }
 
   // Cập nhật user
   @PutMapping("/{id}")
+  @PreAuthorize("isAuthenticated()")
   public ResponseEntity<UserResponse> updateUser(@PathVariable Long id, @RequestBody UserRequest request) {
     try {
       UserResponse updated = userService.updateUser(id, request);
@@ -71,6 +76,7 @@ public class UserController {
 
   // Xóa user
   @DeleteMapping("/{id}")
+  @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
     userService.deleteUser(id);
     return ResponseEntity.noContent().build();
@@ -78,6 +84,7 @@ public class UserController {
 
   // ✅ UPDATED: Đóng băng user - Better response format
   @PostMapping("/{id}/freeze")
+  @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<Map<String, Object>> freezeUser(@PathVariable Long id) {
     try {
       UserResponse resp = userService.freezeUser(id);
@@ -106,6 +113,7 @@ public class UserController {
 
   // ✅ UPDATED: Mở băng user - Better response format
   @PostMapping("/{id}/unfreeze")
+  @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<Map<String, Object>> unfreezeUser(@PathVariable Long id) {
     try {
       UserResponse resp = userService.unfreezeUser(id);
@@ -134,6 +142,7 @@ public class UserController {
 
   // ✅ NEW: Get user status - Useful for admin dashboard
   @GetMapping("/{id}/status")
+  @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<Map<String, Object>> getUserStatus(@PathVariable Long id) {
     try {
       UserResponse user = userService.getUserById(id);
@@ -155,6 +164,7 @@ public class UserController {
 
   // ✅ NEW: Bulk freeze/unfreeze users
   @PostMapping("/bulk-freeze")
+  @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<Map<String, Object>> bulkFreezeUsers(@RequestBody Map<String, Object> request) {
     try {
       @SuppressWarnings("unchecked")
@@ -211,6 +221,7 @@ public class UserController {
 
   // ✅ NEW: Test endpoint for admin functions
   @GetMapping("/admin/test")
+  @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<Map<String, Object>> testAdminEndpoint() {
     Map<String, Object> response = new HashMap<>();
     response.put("message", "Admin user management endpoints are working");

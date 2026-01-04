@@ -6,6 +6,7 @@ import org.example.ktigerstudybe.service.sentencerewritingquestion.SentenceRewri
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -28,16 +29,19 @@ public class SentenceRewritingQuestionController {
     }
 
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public SentenceRewritingQuestionResponse create(@RequestBody SentenceRewritingQuestionRequest request) {
         return service.create(request);
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public SentenceRewritingQuestionResponse update(@PathVariable Long id, @RequestBody SentenceRewritingQuestionRequest request) {
         return service.update(id, request);
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public void delete(@PathVariable Long id) {
         service.delete(id);
     }
@@ -50,6 +54,7 @@ public class SentenceRewritingQuestionController {
     //ad
     // Phân trang và tìm kiếm theo lessonId cho admin
     @GetMapping("/lesson/{lessonId}/paged")
+    @PreAuthorize("hasRole('ADMIN')")
     public Page<SentenceRewritingQuestionResponse> getByLessonIdPaged(
             @PathVariable Long lessonId,
             @RequestParam(defaultValue = "") String keyword,

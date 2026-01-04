@@ -2,6 +2,7 @@ package org.example.ktigerstudybe.service.auth;
 
 import org.example.ktigerstudybe.model.PasswordResetToken;
 import org.example.ktigerstudybe.repository.PasswordResetTokenRepository;
+import org.example.ktigerstudybe.security.JwtTokenProvider;
 import org.example.ktigerstudybe.service.email.EmailService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,10 +37,13 @@ public class AuthServiceImpl implements AuthService {
     private final UserXPService userXPService;
     private final PasswordResetTokenRepository tokenRepository;
     private final EmailService emailService;
+    @Autowired
+    private JwtTokenProvider jwtTokenProvider;
 
     @Override
     @Transactional
     public AuthResponse signUp(SignUpRequest request) {
+
         if (userRepository.existsByEmail(request.getEmail())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email đã được sử dụng.");
         }
@@ -67,7 +71,8 @@ public class AuthServiceImpl implements AuthService {
         resp.setUserId(user.getUserId());
         resp.setEmail(user.getEmail());
         resp.setFullName(user.getFullName());
-        resp.setToken("dummy-token-for-now");
+        String token = jwtTokenProvider.generateToken(user.getUserId(), user.getEmail(), user.getRole());
+        resp.setToken(token);
         resp.setRole(user.getRole());
 
         return resp;
@@ -95,7 +100,8 @@ public class AuthServiceImpl implements AuthService {
         resp.setUserId(user.getUserId());
         resp.setEmail(user.getEmail());
         resp.setFullName(user.getFullName());
-        resp.setToken("dummy-token-for-now");
+        String token = jwtTokenProvider.generateToken(user.getUserId(), user.getEmail(), user.getRole());
+        resp.setToken(token);
         resp.setRole(user.getRole());
 
         return resp;

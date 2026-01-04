@@ -10,6 +10,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -26,6 +27,7 @@ public class UserProgressController {
 
     // Existing method
     @PostMapping("/complete")
+
     public ResponseEntity<Map<String, String>> completeLesson(@RequestBody UserProgressRequest request) {
         userProgressService.completeLesson(request.getUserId(), request.getLessonId());
 
@@ -47,6 +49,7 @@ public class UserProgressController {
 
     // Lấy tất cả progress của user theo userId cho Profile page - trả về DTO
     @GetMapping("/user/{userId}")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<List<UserProgressDTO>> getUserProgress(@PathVariable Long userId) {
         try {
             List<UserProgress> progressList = userProgressService.findByUserId(userId);

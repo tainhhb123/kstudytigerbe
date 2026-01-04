@@ -5,6 +5,7 @@ import org.example.ktigerstudybe.dto.resp.GrammarTheoryResponse;
 import org.example.ktigerstudybe.service.grammarTheory.GrammarTheoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -38,12 +39,14 @@ public class GrammarTheoryController {
 
     // Tạo mới grammar theory
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public GrammarTheoryResponse createGrammarTheory(@RequestBody GrammarTheoryRequest request) {
         return grammarTheoryService.createGrammarTheory(request);
     }
 
     // Sửa grammar theory
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<GrammarTheoryResponse> updateGrammarTheory(
             @PathVariable Long id,
             @RequestBody GrammarTheoryRequest request) {
@@ -57,12 +60,14 @@ public class GrammarTheoryController {
 
     // Xóa grammar theory
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> deleteGrammarTheory(@PathVariable Long id) {
         grammarTheoryService.deleteGrammarTheory(id);
         return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/lesson/{lessonId}")
+
     public List<GrammarTheoryResponse> getGrammarByLesson(@PathVariable Long lessonId) {
         return grammarTheoryService.getGrammarByLessonId(lessonId);
     }
@@ -76,6 +81,7 @@ public class GrammarTheoryController {
     //admin
     // Sử dụng service với method mới
     @GetMapping("/lessons/{lessonId}/grammar/paged")
+    @PreAuthorize("hasRole('ADMIN')")
     public Page<GrammarTheoryResponse> getGrammarPaged(
             @PathVariable Long lessonId,
             @RequestParam(required = false) String searchTerm,

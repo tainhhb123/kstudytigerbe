@@ -5,6 +5,7 @@ import org.example.ktigerstudybe.dto.resp.AnswerChoiceResponse;
 import org.example.ktigerstudybe.service.answerChoice.AnswerChoiceService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -33,11 +34,13 @@ public class AnswerChoiceController {
 
     // Admin tạo đáp án
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public AnswerChoiceResponse createChoice(@RequestBody AnswerChoiceRequest request) {
         return answerChoiceService.createChoice(request);
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<AnswerChoiceResponse> updateChoice(
             @PathVariable Long id,
             @RequestBody AnswerChoiceRequest request
@@ -50,6 +53,7 @@ public class AnswerChoiceController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> deleteChoice(@PathVariable Long id) {
         answerChoiceService.deleteChoice(id);
         return ResponseEntity.noContent().build();

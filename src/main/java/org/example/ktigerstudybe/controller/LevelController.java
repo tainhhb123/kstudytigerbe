@@ -5,6 +5,7 @@ import org.example.ktigerstudybe.dto.resp.LevelResponse;
 import org.example.ktigerstudybe.service.level.LevelService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -31,11 +32,13 @@ public class LevelController {
     }
 
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public LevelResponse createLevel(@RequestBody LevelRequest request) {
         return levelService.createLevel(request);
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<LevelResponse> updateLevel(@PathVariable Long id, @RequestBody LevelRequest request) {
         try {
             return ResponseEntity.ok(levelService.updateLevel(id, request));
@@ -45,6 +48,7 @@ public class LevelController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> deleteLevel(@PathVariable Long id) {
         levelService.deleteLevel(id);
         return ResponseEntity.noContent().build();

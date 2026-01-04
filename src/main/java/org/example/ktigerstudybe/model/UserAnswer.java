@@ -39,4 +39,17 @@ public class UserAnswer {
 
     @Column(name = "score", precision = 5, scale = 2)
     private BigDecimal score = BigDecimal.ZERO;
+
+    // ===== AI Grading (ESSAY) =====
+    @Column(name = "ai_score")
+    private Integer aiScore;
+
+    @Column(name = "ai_feedback", columnDefinition = "TEXT")
+    private String aiFeedback;
+
+    @Column(name = "ai_breakdown", columnDefinition = "JSON")
+    private String aiBreakdown;
+
+    @Column(name = "ai_suggestions", columnDefinition = "JSON")
+    private String aiSuggestions;
 }

@@ -36,10 +36,18 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     /**
      * Main filter method - chạy cho mỗi HTTP request
      */
+
     @Override
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
+        String path = request.getRequestURI();
+        // ✅ BYPASS filter cho PUBLIC endpoints (không cần JWT)
+        if (path.startsWith("/api/auth/") || path.startsWith("/api/public/")) {
+            System.out.println("⏭️ Skipping JWT filter for PUBLIC endpoint: " + path);
+            filterChain.doFilter(request, response);
+            return;
+        }
         try {
             // 1. Lấy JWT token từ request header
             String jwt = getJwtFromRequest(request);

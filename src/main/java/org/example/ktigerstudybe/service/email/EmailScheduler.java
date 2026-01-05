@@ -17,7 +17,7 @@ public class EmailScheduler {
     @Autowired
     private UserRepository userRepository;
 
-    @Scheduled(cron = "0 52 9 * * *")
+    @Scheduled(cron = "0 25 21 * * *")
     public void sendReminderEmail() {
         List<User> users = userRepository.findAllActiveUsers();
 

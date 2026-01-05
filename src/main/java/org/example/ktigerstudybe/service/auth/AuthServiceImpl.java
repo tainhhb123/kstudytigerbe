@@ -135,6 +135,15 @@ public class AuthServiceImpl implements AuthService {
         } else {
             resetLink = "http://localhost:5173/reset-password?token=" + token;
         }
+//
+//        // ✅ IN RA CONSOLE THAY VÌ GỬI EMAIL (tạm thời do lỗi SMTP DNS)
+//        System.out.println("\n========== 📧 RESET PASSWORD LINK ==========");
+//        System.out.println("📧 Email: " + email);
+//        System.out.println("🔑 Token: " + token);
+//        System.out.println("🔗 Link: " + resetLink);
+//        System.out.println("⏰ Expiry: " + expiry + " (15 phút)");
+//        System.out.println("============================================\n");
+
 
         String content = "Click vào link này để đặt lại mật khẩu (có hiệu lực 15 phút): " + resetLink;
         emailService.sendSimpleEmail(email, "Yêu cầu đặt lại mật khẩu", content);

@@ -3,7 +3,7 @@ package org.example.ktigerstudybe.model;
 import jakarta.persistence.*;
 import lombok.*;
 import org.example.ktigerstudybe.enums.QuestionType;
-
+import java.util.List;
 import java.math.BigDecimal;
 
 @Getter
@@ -24,6 +24,8 @@ public class Question {
     @JoinColumn(name = "section_id", nullable = false)
     private ExamSection section;
 
+    @OneToMany(mappedBy = "question", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<AnswerChoice> choices;
     /**
      * group_id:
      * - NULL: câu đơn lẻ

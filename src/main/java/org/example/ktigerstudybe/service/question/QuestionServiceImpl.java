@@ -9,13 +9,16 @@ import org.example.ktigerstudybe.model.Question;
 import org.example.ktigerstudybe.repository.AnswerChoiceRepository;
 import org.example.ktigerstudybe.repository.ExamSectionRepository;
 import org.example.ktigerstudybe.repository.QuestionRepository;
+import org.example.ktigerstudybe.repository.UserAnswerRepository;  // ← THÊM IMPORT
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@Transactional
 public class QuestionServiceImpl implements QuestionService {
 
     @Autowired
@@ -25,9 +28,12 @@ public class QuestionServiceImpl implements QuestionService {
     private ExamSectionRepository examSectionRepository;
 
     @Autowired
-    private AnswerChoiceRepository answerChoiceRepository; // THÊM
+    private AnswerChoiceRepository answerChoiceRepository;
 
-    // ===== Mapper for AnswerChoice ===== THÊM METHOD NÀY
+    @Autowired
+    private UserAnswerRepository userAnswerRepository;  // ← THÊM INJECT
+
+    // ===== Mapper for AnswerChoice =====
     private AnswerChoiceResponse toAnswerChoiceResponse(AnswerChoice ac) {
         AnswerChoiceResponse resp = new AnswerChoiceResponse();
         resp.setChoiceId(ac.getChoiceId());
@@ -38,7 +44,7 @@ public class QuestionServiceImpl implements QuestionService {
         return resp;
     }
 
-    // ===== Mapper for Question ===== SỬA LẠI METHOD NÀY
+    // ===== Mapper for Question =====
     private QuestionResponse toResponse(Question q) {
         QuestionResponse resp = new QuestionResponse();
 
@@ -53,7 +59,7 @@ public class QuestionServiceImpl implements QuestionService {
         resp.setImageUrl(q.getImageUrl());
         resp.setPoints(q.getPoints());
 
-        // THÊM PHẦN NÀY - Map choices
+        // Map choices
         List<AnswerChoice> choices = answerChoiceRepository.findByQuestionId(q.getQuestionId());
         resp.setChoices(
                 choices.stream()
@@ -124,6 +130,18 @@ public class QuestionServiceImpl implements QuestionService {
 
     @Override
     public void deleteQuestion(Long id) {
+        // 1. Lấy tất cả answer_choice của question này
+        List<AnswerChoice> choices = answerChoiceRepository.findByQuestionId(id);
+
+        // 2. Xóa tất cả user_answer tham chiếu đến các choice này
+        for (AnswerChoice choice : choices) {
+            userAnswerRepository.deleteByChoiceChoiceId(choice.getChoiceId());
+        }
+
+        // 3. Xóa user_answer theo questionId (cho SHORT/ESSAY không có choice)
+        userAnswerRepository.deleteByQuestionQuestionId(id);
+
+        // 4. Xóa question (cascade sẽ tự động xóa answer_choices)
         questionRepository.deleteById(id);
     }
 }

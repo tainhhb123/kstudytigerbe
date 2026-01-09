@@ -71,4 +71,12 @@ public class AuthController {
         response.put("timestamp", System.currentTimeMillis());
         return ResponseEntity.ok(response);
     }
+    // ✅ THÊM VÀO AuthController.java
+
+    @PostMapping("/reset-password")
+    @Transactional
+    public ResponseEntity<?> resetPassword(@RequestBody ResetPasswordRequest request) {
+        authService.resetPassword(request.getToken(), request.getNewPassword());
+        return ResponseEntity.ok("Đặt lại mật khẩu thành công! Bạn có thể đăng nhập lại.");
+    }
 }

@@ -9,8 +9,11 @@ import org.example.ktigerstudybe.service.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -46,13 +49,21 @@ public class UserController {
 
   // Lấy user theo id
   @GetMapping("/{id}")
+  @PreAuthorize("isAuthenticated()")
   public ResponseEntity<UserResponse> getUserById(@PathVariable Long id) {
-    try {
-      UserResponse resp = userService.getUserById(id);
-      return ResponseEntity.ok(resp);
-    } catch (Exception e) {
-      return ResponseEntity.notFound().build();
+
+    Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+    Long currentUserId = Long.parseLong(auth.getName());
+
+    boolean isAdmin = auth.getAuthorities().stream()
+            .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+
+    // OWNER CHECK
+    if (!isAdmin && !currentUserId.equals(id)) {
+      return ResponseEntity.status(403).build();
     }
+
+    return ResponseEntity.ok(userService.getUserById(id));
   }
 
   // Tạo mới user
@@ -111,7 +122,7 @@ public class UserController {
     }
   }
 
-  // ✅ UPDATED: Mở băng user - Better response format
+  // ✅ UPDATED: Mở băng user - Better reszponse format
   @PostMapping("/{id}/unfreeze")
   @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<Map<String, Object>> unfreezeUser(@PathVariable Long id) {
@@ -200,10 +211,31 @@ public class UserController {
   }
 
   @GetMapping("/email/{email}")
-  public ResponseEntity<UserResponse> getByEmail(@PathVariable String email) {
+  @PreAuthorize("isAuthenticated()") // ← Phải đăng nhập
+  public ResponseEntity<UserResponse> getByEmail(
+          @PathVariable String email,
+          Authentication authentication) {
     try {
-      UserResponse resp = userService.getUserByEmail(email);
-      return ResponseEntity.ok(resp);
+      // Lấy userId từ JWT (SecurityContextHolder)
+      Long currentUserId = Long.parseLong(authentication.getName());
+
+      // Lấy thông tin user đang request
+      UserResponse currentUser = userService.getUserById(currentUserId);
+
+      // Lấy thông tin user được yêu cầu
+      UserResponse requestedUser = userService.getUserByEmail(email);
+
+      // Check quyền: Chính user đó HOẶC ADMIN
+      boolean isAdmin = authentication.getAuthorities().stream()
+              .anyMatch(auth -> auth.getAuthority().equals("ROLE_ADMIN"));
+      boolean isOwnEmail = currentUser.getEmail().equalsIgnoreCase(email);
+
+      if (!isOwnEmail && !isAdmin) {
+        // User cố xem email người khác → 403 Forbidden
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+      }
+
+      return ResponseEntity.ok(requestedUser);
     } catch (NoSuchElementException e) {
       return ResponseEntity.notFound().build();
     }

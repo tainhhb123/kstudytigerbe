@@ -76,13 +76,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 // 6. Lưu vào SecurityContext (cho Spring Security check)
                 SecurityContextHolder.getContext().setAuthentication(authentication);
 
-                System.out.println("✅ JWT Auth successful for user: " + userId);
+                System.out.println(" JWT Auth successful for user: " + userId);
             } else {
-                System.out.println("⚠️ No valid JWT token found");
+                System.out.println("⚠No valid JWT token found");
             }
 
         } catch (Exception ex) {
-            System.err.println("❌ JWT Auth failed: " + ex.getMessage());
+            System.err.println(" JWT Auth failed: " + ex.getMessage());
             ex.printStackTrace();
         }
 

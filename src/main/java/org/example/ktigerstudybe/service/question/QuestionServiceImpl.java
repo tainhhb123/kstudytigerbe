@@ -58,6 +58,7 @@ public class QuestionServiceImpl implements QuestionService {
         resp.setAudioUrl(q.getAudioUrl());
         resp.setImageUrl(q.getImageUrl());
         resp.setPoints(q.getPoints());
+        resp.setCorrectAnswer(q.getCorrectAnswer());
 
         // Map choices
         List<AnswerChoice> choices = answerChoiceRepository.findByQuestionId(q.getQuestionId());

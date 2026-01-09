@@ -30,6 +30,8 @@ public class QuestionResponse {
 
     private String imageUrl;
 
+    private String correctAnswer;
+
     private BigDecimal points;
     private List<AnswerChoiceResponse> choices;
 

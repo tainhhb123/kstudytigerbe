@@ -1,0 +1,48 @@
+name: Deploy Spring Boot Backend to EC2
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v5
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Build jar
+        run: ./mvnw clean package -DskipTests
+
+      - name: Setup SSH
+        run: |
+          mkdir -p ~/.ssh
+          printf "%s" "${{ secrets.EC2_SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H "${{ secrets.EC2_HOST }}" >> ~/.ssh/known_hosts
+
+      - name: Copy jar to EC2
+        run: |
+          scp -i ~/.ssh/id_rsa target/springboot-thymeleaf-crud-web-app-0.0.1-SNAPSHOT.jar ${{ secrets.EC2_USERNAME }}@${{ secrets.EC2_HOST }}:/tmp/app.jar
+
+      - name: Deploy on EC2
+        run: |
+          ssh -i ~/.ssh/id_rsa ${{ secrets.EC2_USERNAME }}@${{ secrets.EC2_HOST }} << 'EOF'
+            set -e
+            sudo mkdir -p /var/www/myapp
+            sudo mv /tmp/app.jar /var/www/myapp/app.jar
+            sudo chown ubuntu:ubuntu /var/www/myapp/app.jar
+            sudo systemctl restart myapp-backend
+          EOF

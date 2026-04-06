@@ -25,7 +25,7 @@ public class LessonController {
 //        return lessonService.getAllLessons();
 //    }
 
-    // Lấy tất cả bài học hoặc theo Level
+    // Lấy tất cả bài học hoặc theo Level ha
     @GetMapping
     public List<LessonResponse> getLessons(@RequestParam(required = false) Long levelId) {
         if (levelId != null) {

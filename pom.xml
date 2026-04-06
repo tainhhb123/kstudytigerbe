@@ -6,9 +6,10 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.0.4</version>
-        <relativePath/> <!-- lookup parent from repository -->
+        <version>3.2.2</version>
+        <relativePath/>
     </parent>
+
     <groupId>net.javaguides</groupId>
     <artifactId>springboot-thymeleaf-crud-web-app</artifactId>
     <version>0.0.1-SNAPSHOT</version>
